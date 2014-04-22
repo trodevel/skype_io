@@ -85,16 +85,12 @@ EXE=
 
 #vpath %.cpp .
 
-SRCC = event.cpp event_gen.cpp event_parser.cpp gdk_wrap.cpp parser_types.cpp skype-service.c dbus.cpp dbus_proxy.cpp skype_service_callback.cpp skype_service_c.cpp skype_wrap.cpp
+SRCC = event.cpp event_gen.cpp event_parser.cpp gdk_wrap.cpp parser_types.cpp skype-service.c dbus.cpp dbus_proxy.cpp \
+		skype_service_callback.cpp skype_service_c.cpp skype_wrap.cpp skype_io.cpp
 OBJS = $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRCC)) $(patsubst %.c,$(OBJDIR)/%.o,$(SRCC))
 
-#$(OBJS): | $(OBJDIR)
-#$(OBJS): | $(OBJDIR)
-
-#$(OBJDIR):
-#	@echo $(SRCC)
-#	@echo objects $(OBJS)
-#	@mkdir -p $@
+LIB_NAMES = utils
+LIBS = $(patsubst %,$(BINDIR)/lib%.a,$(LIB_NAMES))
 
 all: static
 
@@ -123,8 +119,18 @@ $(TARGET): $(BINDIR) $(BINDIR)/$(TARGET)
 	ln -sf $(BINDIR)/$(TARGET) $(TARGET)
 	@echo "$@ uptodate - ${MODE}"
 
-$(BINDIR)/$(TARGET): $(OBJDIR)/$(TARGET).o $(OBJS) $(BINDIR)/$(STATICLIB)
-	$(CC) $(CFLAGS) $(CDBG) -o $@ $(OBJDIR)/$(TARGET).o $(GDK_LIB) $(LFLAGS_TEST)
+$(BINDIR)/$(TARGET): $(LIBS) $(OBJDIR)/$(TARGET).o $(OBJS) $(BINDIR)/$(STATICLIB)
+	$(CC) $(CFLAGS) $(CDBG) -o $@ $(OBJDIR)/$(TARGET).o $(LFLAGS_TEST) $(LIBS) $(BOOST_LIB)/$(BOOST_LIB_THREAD) $(BOOST_LIB)/$(BOOST_LIB_SYSTEM) \
+		$(GDK_LIB)
+	
+
+$(BINDIR)/lib%.a: %		# somehow this rule doesn't work
+	cd ../$<; make; cd $(project)
+	ln -sf ../$</$@ $(BINDIR)
+
+$(BINDIR)/libutils.a:
+	cd ../utils; make; cd $(project)
+	ln -sf ../../utils/$@ $(BINDIR)
 
 $(BINDIR):
 	mkdir -p $(OBJDIR)

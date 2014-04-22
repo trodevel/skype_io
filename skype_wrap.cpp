@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: skype_wrap.cpp 422 2014-04-18 23:55:29Z serge $
+// $Id: skype_wrap.cpp 435 2014-04-22 22:02:15Z serge $
 
 #include "skype_wrap.h"     // self
 
@@ -277,18 +277,26 @@ void SkypeWrap::control_thread()
 
     std::string input;
 
-    bool done = false;
-
-    do
+    while( true )
     {
-        std::cout << "your command: " << std::endl;
+        std::cout << "your command: ";
 
-        std::cin >> input;
+        std::getline( std::cin, input );
+
+        std::cout << "command: " << input << std::endl;
 
         if( input == "exit" || input == "quit" )
-            done = true;
+            break;
 
-    } while( !done );
+        std::string response;
+        bool b = send( input, response );
+
+        if( b == false )
+        {
+            std::cout << "ERROR: cannot process command '" << input << "'" << std::endl;
+        }
+
+    };
 
     std::cout << "exiting ..." << std::endl;
 
