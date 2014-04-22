@@ -86,7 +86,7 @@ EXE=
 #vpath %.cpp .
 
 SRCC = event.cpp event_gen.cpp event_parser.cpp gdk_wrap.cpp parser_types.cpp skype-service.c dbus.cpp dbus_proxy.cpp \
-		skype_service_callback.cpp skype_service_c.cpp skype_wrap.cpp skype_io.cpp
+		skype_service_callback.cpp skype_service_c.cpp skype_wrap.cpp skype_io.cpp command_gen.cpp
 OBJS = $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRCC)) $(patsubst %.c,$(OBJDIR)/%.o,$(SRCC))
 
 LIB_NAMES = utils
