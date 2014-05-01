@@ -19,14 +19,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: parser_types.h 414 2014-04-18 22:51:52Z serge $
+// $Id: parser_types.h 474 2014-04-29 17:49:24Z serge $
 
 #ifndef PARSER_TYPES_H
 #define PARSER_TYPES_H
 
 #include "namespace_skypewrap.h"    // NAMESPACE_SKYPE_WRAP_START
 
-#include "../utils/Types.h"         // uint32
+#include "../utils/types.h"         // uint32
 
 #include <string>
 
