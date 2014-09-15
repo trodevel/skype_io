@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: skype-service.c 421 2014-04-18 23:51:59Z serge $
+// $Id: skype-service.c 398 2014-04-18 23:51:59Z serge $
 
 #include "skype-service.h"      // self
 

@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: parser_types.h 474 2014-04-29 17:49:24Z serge $
+// $Id: parser_types.h 451 2014-04-29 17:49:24Z serge $
 
 #ifndef PARSER_TYPES_H
 #define PARSER_TYPES_H

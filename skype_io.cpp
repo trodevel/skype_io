@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: skype_io.cpp 438 2014-04-23 16:45:36Z serge $
+// $Id: skype_io.cpp 415 2014-04-23 16:45:36Z serge $
 
 #include "skype_io.h"       // self
 

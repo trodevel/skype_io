@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: example.cpp 432 2014-04-22 17:30:16Z serge $
+// $Id: example.cpp 409 2014-04-22 17:30:16Z serge $
 
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>

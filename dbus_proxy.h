@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: dbus_proxy.h 419 2014-04-18 23:45:14Z serge $
+// $Id: dbus_proxy.h 396 2014-04-18 23:45:14Z serge $
 
 #ifndef DBUS_PROXY_H
 #define DBUS_PROXY_H

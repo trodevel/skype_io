@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: gdk_wrap.cpp 420 2014-04-18 23:49:09Z serge $
+// $Id: gdk_wrap.cpp 397 2014-04-18 23:49:09Z serge $
 
 #include "gdk_wrap.h"       // self
 

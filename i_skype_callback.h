@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: i_skype_callback.h 474 2014-04-29 17:49:24Z serge $
+// $Id: i_skype_callback.h 451 2014-04-29 17:49:24Z serge $
 
 #ifndef I_EVENT_HANDLER_H
 #define I_EVENT_HANDLER_H

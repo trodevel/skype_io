@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: skype_io.h 438 2014-04-23 16:45:36Z serge $
+// $Id: skype_io.h 1009 2014-09-15 16:37:09Z serge $
 
 #ifndef SKYPE_IO_H
 #define SKYPE_IO_H
@@ -27,13 +27,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <string>                   // std::string
 #include <boost/thread.hpp>         // boost::mutex
 
+#include "../threcon/i_controllable.h"      // IControllable
+
 #include "namespace_skypewrap.h"    // NAMESPACE_SKYPE_WRAP_START
 #include "skype_wrap.h"             // SkypeWrap
 #include "event_gen.h"              // EventGen
 
 NAMESPACE_SKYPE_WRAP_START
 
-class SkypeIo
+class SkypeIo: public virtual threcon::IControllable
 {
 
 public:
@@ -42,6 +44,7 @@ public:
 
     bool init();
 
+    // interface threcon::IControllable
     bool shutdown();
 
     bool is_inited() const;

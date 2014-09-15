@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: gdk_wrap.h 414 2014-04-18 22:51:52Z serge $
+// $Id: gdk_wrap.h 391 2014-04-18 22:51:52Z serge $
 
 #ifndef GDK_WRAP_H
 #define GDK_WRAP_H

@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: dbus.h 419 2014-04-18 23:45:14Z serge $
+// $Id: dbus.h 396 2014-04-18 23:45:14Z serge $
 
 #ifndef SKYPE_DBUS_H
 #define SKYPE_DBUS_H
