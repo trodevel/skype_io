@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event_parser.cpp 391 2014-04-18 22:51:52Z serge $
+// $Id: event_parser.cpp 1097 2014-10-01 18:59:43Z serge $
 
 #include "event_parser.h"       // self
 
@@ -77,7 +77,7 @@ Event EventParser::handle_tokens( const std::vector< std::string > & toks, const
 Event EventParser::create_unknown( const std::string & s )
 {
     static std::string  dummy_s;
-    return Event( Event::UNKNOWN, s, dummy_s, 0, 0, CS_NONE, US_NONE, CLS_NONE );
+    return Event( Event::UNKNOWN, s, dummy_s, 0, 0, conn_status_e::NONE, user_status_e::NONE, call_status_e::NONE );
 }
 
 Event EventParser::handle_tokens__throwing( const std::vector< std::string > & toks, const std::string & s )
@@ -129,7 +129,7 @@ Event EventParser::handle_connstatus( const std::vector< std::string > & toks )
 
     std::string dummy_s;
 
-    return Event( Event::CONNSTATUS, dummy_s, dummy_s, 0, 0, c, US_NONE, CLS_NONE );
+    return Event( Event::CONNSTATUS, dummy_s, dummy_s, 0, 0, c, user_status_e::NONE, call_status_e::NONE );
 }
 Event EventParser::handle_userstatus( const std::vector< std::string > & toks )
 {
@@ -140,7 +140,7 @@ Event EventParser::handle_userstatus( const std::vector< std::string > & toks )
 
     std::string dummy_s;
 
-    return Event( Event::USERSTATUS, dummy_s, dummy_s, 0, 0, CS_NONE, c, CLS_NONE );
+    return Event( Event::USERSTATUS, dummy_s, dummy_s, 0, 0, conn_status_e::NONE, c, call_status_e::NONE );
 }
 Event EventParser::handle_currentuserhandle( const std::vector< std::string > & toks )
 {
@@ -151,7 +151,7 @@ Event EventParser::handle_currentuserhandle( const std::vector< std::string > & 
 
     std::string dummy_s;
 
-    return Event( Event::CURRENTUSERHANDLE, dummy_s, s, 0, 0, CS_NONE, US_NONE, CLS_NONE );
+    return Event( Event::CURRENTUSERHANDLE, dummy_s, s, 0, 0, conn_status_e::NONE, user_status_e::NONE, call_status_e::NONE );
 }
 Event EventParser::handle_call( const std::vector< std::string > & toks )
 {
@@ -174,7 +174,7 @@ Event EventParser::handle_call( const std::vector< std::string > & toks )
 
         std::string dummy_s;
 
-        return Event( Event::CALL_DURATION, dummy_s, dummy_s, dur, call_id, CS_NONE, US_NONE, CLS_NONE );
+        return Event( Event::CALL_DURATION, dummy_s, dummy_s, dur, call_id, conn_status_e::NONE, user_status_e::NONE, call_status_e::NONE );
     }
     else if( keyw2 == KEYW_STATUS )
     {
@@ -185,7 +185,7 @@ Event EventParser::handle_call( const std::vector< std::string > & toks )
 
         std::string dummy_s;
 
-        return Event( Event::CALL_STATUS, dummy_s, dummy_s, 0, call_id, CS_NONE, US_NONE, s );
+        return Event( Event::CALL_STATUS, dummy_s, dummy_s, 0, call_id, conn_status_e::NONE, user_status_e::NONE, s );
     }
     else if( keyw2 == KEYW_VAA_INPUT_STATUS )
     {
@@ -200,7 +200,7 @@ Event EventParser::handle_call( const std::vector< std::string > & toks )
 
         std::string dummy_s;
 
-        return Event( Event::CALL_VAA_INPUT_STATUS, dummy_s, dummy_s, s, call_id, CS_NONE, US_NONE, CLS_NONE );
+        return Event( Event::CALL_VAA_INPUT_STATUS, dummy_s, dummy_s, s, call_id, conn_status_e::NONE, user_status_e::NONE, call_status_e::NONE );
     }
     else if( keyw2 == KEYW_FAILUREREASON )
     {
@@ -211,12 +211,12 @@ Event EventParser::handle_call( const std::vector< std::string > & toks )
 
         std::string dummy_s;
 
-        return Event( Event::CALL_FAILUREREASON, dummy_s, dummy_s, c, call_id, CS_NONE, US_NONE, CLS_NONE );
+        return Event( Event::CALL_FAILUREREASON, dummy_s, dummy_s, c, call_id, conn_status_e::NONE, user_status_e::NONE, call_status_e::NONE );
     }
 
     std::string dummy_s;
 
-    return Event( Event::UNKNOWN, keyw2, dummy_s, 0, 0, CS_NONE, US_NONE, CLS_NONE );
+    return Event( Event::UNKNOWN, keyw2, dummy_s, 0, 0, conn_status_e::NONE, user_status_e::NONE, call_status_e::NONE );
 }
 
 Event EventParser::handle_alter_call( const std::vector< std::string > & toks )
@@ -245,7 +245,7 @@ Event EventParser::handle_alter_call( const std::vector< std::string > & toks )
             return Event( is_input?
                     Event::ALTER_CALL_SET_INPUT_FILE :
                     Event::ALTER_CALL_SET_OUTPUT_FILE,
-                    pars[1], "", 0, call_id, CS_NONE, US_NONE, CLS_NONE );
+                    pars[1], "", 0, call_id, conn_status_e::NONE, user_status_e::NONE, call_status_e::NONE );
     }
 
     return create_unknown( toks[3] );

@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: parser_types.h 451 2014-04-29 17:49:24Z serge $
+// $Id: parser_types.h 1097 2014-10-01 18:59:43Z serge $
 
 #ifndef PARSER_TYPES_H
 #define PARSER_TYPES_H
@@ -32,29 +32,47 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 NAMESPACE_SKYPE_WRAP_START
 
-enum conn_status_e
+enum class conn_status_e
 {
-    CS_NONE         = 0,
-    CS_OFFLINE,
-    CS_CONNECTING,
-    CS_ONLINE,
+    NONE         = 0,
+    OFFLINE,
+    CONNECTING,
+    ONLINE,
 };
 
-enum user_status_e
+enum class user_status_e
 {
-    US_NONE     = 0,
-    US_OFFLINE,
-    US_ONLINE,
+    NONE     = 0,
+    OFFLINE,
+    ONLINE,
 };
 
-enum call_status_e
+enum class call_status_e
 {
-    CLS_NONE     = 0,
-    CLS_UNPLACED,
-    CLS_ROUTING,
-    CLS_RINGING,
-    CLS_INPROGRESS,
-    CLS_FINISHED
+    NONE     = 0,
+    UNPLACED,
+    ROUTING,
+    EARLYMEDIA,
+    FAILED,
+    RINGING,
+    INPROGRESS,
+    ONHOLD,
+    FINISHED,
+    MISSED,
+    REFUSED,
+    BUSY,
+    CANCELLED,
+    TRANSFERRING,
+    TRANSFERRED,
+    VM_BUFFERING_GREETING,
+    VM_PLAYING_GREETING,
+    VM_RECORDING,
+    VM_UPLOADING,
+    VM_SENT,
+    VM_CANCELLED,
+    VM_FAILED,
+    WAITING_REDIAL_COMMAND,
+    REDIAL_PENDING
 };
 
 conn_status_e to_conn_status( const std::string & s );

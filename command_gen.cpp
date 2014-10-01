@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: command_gen.cpp 413 2014-04-22 23:28:03Z serge $
+// $Id: command_gen.cpp 1097 2014-10-01 18:59:43Z serge $
 
 #include "command_gen.h"        // self
 
@@ -59,12 +59,12 @@ std::string to_string( call_status_e s )
     static Map m;
     if( m.empty() )
     {
-        m.insert( Map::value_type( CLS_NONE,        "NONE" ));
-        m.insert( Map::value_type( CLS_UNPLACED,    "UNPLACED" ));
-        m.insert( Map::value_type( CLS_ROUTING,     "ROUTING" ));
-        m.insert( Map::value_type( CLS_RINGING,     "RINGING" ));
-        m.insert( Map::value_type( CLS_INPROGRESS,  "INPROGRESS" ));
-        m.insert( Map::value_type( CLS_FINISHED,    "FINISHED" ));
+        m.insert( Map::value_type( call_status_e::NONE,        "NONE" ));
+        m.insert( Map::value_type( call_status_e::UNPLACED,    "UNPLACED" ));
+        m.insert( Map::value_type( call_status_e::ROUTING,     "ROUTING" ));
+        m.insert( Map::value_type( call_status_e::RINGING,     "RINGING" ));
+        m.insert( Map::value_type( call_status_e::INPROGRESS,  "INPROGRESS" ));
+        m.insert( Map::value_type( call_status_e::FINISHED,    "FINISHED" ));
     }
 
     if( 0 == m.count( s ) )
