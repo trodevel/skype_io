@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: parser_types.cpp 1097 2014-10-01 18:59:43Z serge $
+// $Id: parser_types.cpp 1100 2014-10-06 17:21:16Z serge $
 
 #include "parser_types.h"     // self
 
@@ -27,23 +27,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 NAMESPACE_SKYPE_WRAP_START
 
-#define GLUE( _a, _b )  _a ## _b
-
 #define TUPLE_VAL_STR(_x_)  _x_,#_x_
 #define TUPLE_STR_VAL(_x_)  #_x_,_x_
 
-#define TUPLE_STR_VAL_PREF(_pref,_x_)  #_x_,GLUE( _pref, _x_)
-
-#define MAP_INSERT( _m, _val )              _m.insert( Map::value_type( TUPLE_STR_VAL( _val ) ) )
-#define MAP_INSERT_PREF( _m, _pref, _val )  _m.insert( Map::value_type( TUPLE_STR_VAL_PREF( _pref, _val ) ) )
-
-template< typename _M, typename _E, typename _S >
-_M inv_value_type( _E i, _S s )
+template< typename _M, typename _U, typename _V >
+void insert_inverse_pair( _M & map, _U first, _V second )
 {
-    return _M( s, i );
+    map.insert( typename _M::value_type( second, first ) );
 }
-
-#define INV_SPEC(_x)     inv_value_type<Map::value_type,_x,std::string>
 
 conn_status_e to_conn_status( const std::string & s )
 {
@@ -51,10 +42,10 @@ conn_status_e to_conn_status( const std::string & s )
     static Map m;
     if( m.empty() )
     {
-        m.insert( INV_SPEC( conn_status_e )( conn_status_e:: TUPLE_VAL_STR( NONE ) ) );
-        m.insert( INV_SPEC( conn_status_e )( conn_status_e:: TUPLE_VAL_STR( OFFLINE ) ) );
-        m.insert( INV_SPEC( conn_status_e )( conn_status_e:: TUPLE_VAL_STR( CONNECTING ) ) );
-        m.insert( INV_SPEC( conn_status_e )( conn_status_e:: TUPLE_VAL_STR( ONLINE ) ) );
+        insert_inverse_pair( m, conn_status_e:: TUPLE_VAL_STR( NONE ) );
+        insert_inverse_pair( m, conn_status_e:: TUPLE_VAL_STR( OFFLINE ) );
+        insert_inverse_pair( m, conn_status_e:: TUPLE_VAL_STR( CONNECTING ) );
+        insert_inverse_pair( m, conn_status_e:: TUPLE_VAL_STR( ONLINE ) );
     }
 
     if( 0 == m.count( s ) )
@@ -69,9 +60,9 @@ user_status_e to_user_status( const std::string & s )
     static Map m;
     if( m.empty() )
     {
-        m.insert( INV_SPEC( user_status_e )( user_status_e:: TUPLE_VAL_STR( NONE ) ) );
-        m.insert( INV_SPEC( user_status_e )( user_status_e:: TUPLE_VAL_STR( OFFLINE ) ) );
-        m.insert( INV_SPEC( user_status_e )( user_status_e:: TUPLE_VAL_STR( ONLINE ) ) );
+        insert_inverse_pair( m, user_status_e:: TUPLE_VAL_STR( NONE ) );
+        insert_inverse_pair( m, user_status_e:: TUPLE_VAL_STR( OFFLINE ) );
+        insert_inverse_pair( m, user_status_e:: TUPLE_VAL_STR( ONLINE ) );
     }
 
     if( 0 == m.count( s ) )
@@ -86,29 +77,29 @@ call_status_e to_call_status( const std::string & s )
     static Map m;
     if( m.empty() )
     {
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( UNPLACED ) ) );
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( ROUTING ) ) );
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( EARLYMEDIA ) ) );
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( FAILED ) ) );
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( RINGING ) ) );
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( INPROGRESS ) ) );
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( ONHOLD ) ) );
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( FINISHED ) ) );
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( MISSED ) ) );
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( REFUSED ) ) );
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( BUSY ) ) );
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( CANCELLED ) ) );
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( TRANSFERRING ) ) );
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( TRANSFERRED ) ) );
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( VM_BUFFERING_GREETING ) ) );
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( VM_PLAYING_GREETING ) ) );
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( VM_RECORDING ) ) );
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( VM_UPLOADING ) ) );
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( VM_SENT ) ) );
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( VM_CANCELLED ) ) );
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( VM_FAILED ) ) );
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( WAITING_REDIAL_COMMAND ) ) );
-        m.insert( INV_SPEC( call_status_e )( call_status_e:: TUPLE_VAL_STR( REDIAL_PENDING ) ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( UNPLACED ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( ROUTING ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( EARLYMEDIA ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( FAILED ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( RINGING ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( INPROGRESS ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( ONHOLD ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( FINISHED ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( MISSED ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( REFUSED ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( BUSY ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( CANCELLED ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( TRANSFERRING ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( TRANSFERRED ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( VM_BUFFERING_GREETING ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( VM_PLAYING_GREETING ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( VM_RECORDING ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( VM_UPLOADING ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( VM_SENT ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( VM_CANCELLED ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( VM_FAILED ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( WAITING_REDIAL_COMMAND ) );
+        insert_inverse_pair( m, call_status_e:: TUPLE_VAL_STR( REDIAL_PENDING ) );
     }
 
     if( 0 == m.count( s ) )
