@@ -19,12 +19,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: command_gen.cpp 1097 2014-10-01 18:59:43Z serge $
+// $Id: command_gen.cpp 1105 2014-10-07 18:43:13Z serge $
 
 #include "command_gen.h"        // self
 
 #include <sstream>              // std::ostringstream
 #include <map>                  // std::map
+
+#include "str_helper.h"         // to_string
 
 NAMESPACE_SKYPE_WRAP_START
 
@@ -51,26 +53,6 @@ std::string CommandGen::get_call_property( uint32 id, const std::string & s )
     os << "GET CALL " << id << " " << s;
 
     return os.str();
-}
-
-std::string to_string( call_status_e s )
-{
-    typedef std::map< call_status_e, std::string > Map;
-    static Map m;
-    if( m.empty() )
-    {
-        m.insert( Map::value_type( call_status_e::NONE,        "NONE" ));
-        m.insert( Map::value_type( call_status_e::UNPLACED,    "UNPLACED" ));
-        m.insert( Map::value_type( call_status_e::ROUTING,     "ROUTING" ));
-        m.insert( Map::value_type( call_status_e::RINGING,     "RINGING" ));
-        m.insert( Map::value_type( call_status_e::INPROGRESS,  "INPROGRESS" ));
-        m.insert( Map::value_type( call_status_e::FINISHED,    "FINISHED" ));
-    }
-
-    if( 0 == m.count( s ) )
-        return "NONE";
-
-    return m[s];
 }
 
 std::string CommandGen::set_call_status( uint32 id, call_status_e s )

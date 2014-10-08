@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event.h 391 2014-04-18 22:51:52Z serge $
+// $Id: event.h 1103 2014-10-07 18:12:21Z serge $
 
 #ifndef EVENT_H
 #define EVENT_H
@@ -47,6 +47,8 @@ public:
         CALL_DURATION,
         CALL_STATUS,
         CALL_FAILUREREASON,
+        CHAT,
+        CHATMEMBER,
         ALTER_CALL_SET_INPUT_SOUNDCARD,
         ALTER_CALL_SET_INPUT_PORT,
         ALTER_CALL_SET_INPUT_FILE,

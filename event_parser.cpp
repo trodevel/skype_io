@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event_parser.cpp 1097 2014-10-01 18:59:43Z serge $
+// $Id: event_parser.cpp 1103 2014-10-07 18:12:21Z serge $
 
 #include "event_parser.h"       // self
 
@@ -36,6 +36,8 @@ NAMESPACE_SKYPE_WRAP_START
 #define KEYW_CURRENTUSERHANDLE      "CURRENTUSERHANDLE"
 #define KEYW_USERSTATUS             "USERSTATUS"
 #define KEYW_CALL                   "CALL"
+#define KEYW_CHAT                   "CHAT"
+#define KEYW_CHATMEMBER             "CHATMEMBER"
 #define KEYW_DURATION               "DURATION"
 #define KEYW_STATUS                 "STATUS"
 #define KEYW_FAILUREREASON          "FAILUREREASON"
@@ -104,6 +106,14 @@ Event EventParser::handle_tokens__throwing( const std::vector< std::string > & t
     else if( keyw == KEYW_CALL )
     {
         return handle_call( toks );
+    }
+    else if( keyw == KEYW_CHAT )
+    {
+        return handle_chat( toks );
+    }
+    else if( keyw == KEYW_CHATMEMBER )
+    {
+        return handle_chatmember( toks );
     }
     else if( keyw == KEYW_ALTER )
     {
@@ -251,5 +261,18 @@ Event EventParser::handle_alter_call( const std::vector< std::string > & toks )
     return create_unknown( toks[3] );
 }
 
+Event EventParser::handle_chat( const std::vector< std::string > & toks )
+{
+    std::string dummy_s;
+
+    return Event( Event::CHAT, dummy_s, dummy_s, 0, 0, conn_status_e::NONE, user_status_e::NONE, call_status_e::NONE );
+}
+
+Event EventParser::handle_chatmember( const std::vector< std::string > & toks )
+{
+    std::string dummy_s;
+
+    return Event( Event::CHATMEMBER, dummy_s, dummy_s, 0, 0, conn_status_e::NONE, user_status_e::NONE, call_status_e::NONE );
+}
 
 NAMESPACE_SKYPE_WRAP_END

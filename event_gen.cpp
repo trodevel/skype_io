@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event_gen.cpp 393 2014-04-18 23:15:56Z serge $
+// $Id: event_gen.cpp 1103 2014-10-07 18:12:21Z serge $
 
 #include "event_gen.h"       // self
 
@@ -101,6 +101,11 @@ void EventGen::handle( const std::string & s )
         break;
 
     case Event::UNDEF:
+        break;
+
+    case Event::CHAT:
+    case Event::CHATMEMBER:
+        // simply ignore
         break;
 
     case Event::UNKNOWN:
