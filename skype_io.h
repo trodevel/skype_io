@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: skype_io.h 1009 2014-09-15 16:37:09Z serge $
+// $Id: skype_io.h 1124 2014-10-10 17:13:49Z serge $
 
 #ifndef SKYPE_IO_H
 #define SKYPE_IO_H
@@ -31,7 +31,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "namespace_skypewrap.h"    // NAMESPACE_SKYPE_WRAP_START
 #include "skype_wrap.h"             // SkypeWrap
-#include "event_gen.h"              // EventGen
+#include "event_proxy.h"            // EventProxy
 
 NAMESPACE_SKYPE_WRAP_START
 
@@ -84,7 +84,7 @@ private:
 
     SkypeWrap               sw_;
 
-    EventGen                event_gen_;
+    EventProxy              event_proxy_;
 
     std::string             response_;
 };

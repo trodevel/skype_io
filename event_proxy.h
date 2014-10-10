@@ -19,10 +19,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event_gen.h 394 2014-04-18 23:22:23Z serge $
+// $Id: event_proxy.h 1122 2014-10-10 17:13:22Z serge $
 
-#ifndef EVENT_GEN_H
-#define EVENT_GEN_H
+#ifndef EVENT_PROXY_H
+#define EVENT_PROXY_H
 
 #include <string>                   // std::string
 #include <vector>                   // std::vector
@@ -31,14 +31,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "namespace_skypewrap.h"    // NAMESPACE_SKYPE_WRAP_START
 #include "i_observer.h"             // IObserver
-#include "i_skype_callback.h"        // ISkypeCallback
+#include "i_skype_callback.h"       // ISkypeCallback
 
 NAMESPACE_SKYPE_WRAP_START
 
-class EventGen: public IObserver
+class EventProxy: public IObserver
 {
 public:
-    EventGen();
+    EventProxy();
 
     virtual void handle( const std::string & s );
 
@@ -52,4 +52,4 @@ private:
 
 NAMESPACE_SKYPE_WRAP_END
 
-#endif  // EVENT_GEN_H
+#endif  // EVENT_PROXY_H

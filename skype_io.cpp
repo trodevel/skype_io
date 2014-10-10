@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: skype_io.cpp 415 2014-04-23 16:45:36Z serge $
+// $Id: skype_io.cpp 1124 2014-10-10 17:13:49Z serge $
 
 #include "skype_io.h"       // self
 
@@ -57,7 +57,7 @@ bool SkypeIo::init()
         return false;
     }
 
-    bool b = sw_.init( &event_gen_ );
+    bool b = sw_.init( &event_proxy_ );
 
     if( b == false )
     {
@@ -101,7 +101,7 @@ bool SkypeIo::register_handler( ISkypeCallback * eh )
 {
     SCOPE_LOCK( mutex_ );
 
-    return event_gen_.register_handler( eh );
+    return event_proxy_.register_handler( eh );
 }
 
 void SkypeIo::control_thread()

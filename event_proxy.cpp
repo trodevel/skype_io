@@ -19,9 +19,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event_gen.cpp 1119 2014-10-09 18:41:44Z serge $
+// $Id: event_proxy.cpp 1131 2014-10-10 17:33:31Z serge $
 
-#include "event_gen.h"       // self
+#include "event_proxy.h"        // self
 
 #include <iostream>             // cout
 #include <sstream>              // std::ostringstream
@@ -36,14 +36,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 NAMESPACE_SKYPE_WRAP_START
 
-EventGen::EventGen()
+EventProxy::EventProxy()
 {
 }
 
 /**
  * @return true - success, false - error
  */
-bool EventGen::register_handler( ISkypeCallback * eh )
+bool EventProxy::register_handler( ISkypeCallback * eh )
 {
     if( !eh )
         return false;
@@ -58,7 +58,7 @@ bool EventGen::register_handler( ISkypeCallback * eh )
     return true;
 }
 
-void EventGen::handle( const std::string & s )
+void EventProxy::handle( const std::string & s )
 {
     Event *ev = EventParser::to_event( s );
 
@@ -92,6 +92,10 @@ void EventGen::handle( const std::string & s )
 
     case Event::CALL_STATUS:
         std::for_each( ev_.begin(), ev_.end(), boost::bind( &ISkypeCallback::on_call_status, _1, static_cast<CallStatusEvent*>( ev )->get_call_id(), static_cast<CallStatusEvent*>( ev )->get_call_s() ));
+        break;
+
+    case Event::CALL_PSTN_STATUS:
+        std::for_each( ev_.begin(), ev_.end(), boost::bind( &ISkypeCallback::on_call_pstn_status, _1, static_cast<CallPstnStatusEvent*>( ev )->get_call_id(), static_cast<CallPstnStatusEvent*>( ev )->get_par_int(), static_cast<CallPstnStatusEvent*>( ev )->get_par_str() ));
         break;
 
     case Event::CALL_FAILUREREASON:

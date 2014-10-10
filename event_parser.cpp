@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event_parser.cpp 1118 2014-10-09 18:41:01Z serge $
+// $Id: event_parser.cpp 1132 2014-10-10 17:48:27Z serge $
 
 #include "event_parser.h"       // self
 
@@ -80,7 +80,6 @@ Event* EventParser::handle_tokens( const std::vector< std::string > & toks, cons
 
 Event* EventParser::create_unknown( const std::string & s )
 {
-    static std::string  dummy_s;
     return new Event( Event::UNKNOWN );
 }
 
@@ -176,8 +175,6 @@ Event* EventParser::handle_call( const std::vector< std::string > & toks )
 
         uint32 dur = boost::lexical_cast< uint32 >( toks[3] );
 
-        std::string dummy_s;
-
         return new CallDurationEvent( call_id, dur );
     }
     else if( keyw2 == KEYW_STATUS )
@@ -196,7 +193,22 @@ Event* EventParser::handle_call( const std::vector< std::string > & toks )
 
         uint32 error = boost::lexical_cast< uint32 >( toks[3] );
 
-        return new BasicCallParamEvent( Event::CALL_PSTN_STATUS, call_id, error );
+        std::string descr;
+
+        if( toks.size() > 4 )
+        {
+            for( int i = 4; i < (int) toks.size(); ++i )
+            {
+                if( i != 4 )
+                {
+                    descr.append( " " );
+                }
+
+                descr.append( toks[i] );
+            }
+        }
+
+        return new CallPstnStatusEvent( call_id, error, descr );
     }
     else if( keyw2 == KEYW_VAA_INPUT_STATUS )
     {
@@ -208,8 +220,6 @@ Event* EventParser::handle_call( const std::vector< std::string > & toks )
             throw WrongFormat( "VAA_INPUT_STATUS should be TRUE or FALSE" );
 
         uint32 s = ( toks[3] == KEYW_TRUE ) ? 1 : 0;
-
-        std::string dummy_s;
 
         return new CallVaaInputStatusEvent( call_id, s );
     }

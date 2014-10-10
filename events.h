@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: events.h 1117 2014-10-09 18:40:22Z serge $
+// $Id: events.h 1129 2014-10-10 17:32:51Z serge $
 
 #ifndef EVENTS_H
 #define EVENTS_H
@@ -33,6 +33,45 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include "namespace_skypewrap.h"    // NAMESPACE_SKYPE_WRAP_START
 
 NAMESPACE_SKYPE_WRAP_START
+
+class EventDataStr
+{
+public:
+    EventDataStr(
+        const std::string   & par_str ):
+            INIT_MEMBER( par_str )
+    {
+    }
+
+    const std::string& get_par_str() const
+    {
+        return par_str_;
+    }
+
+private:
+    std::string     par_str_;
+};
+
+class EventDataInt
+{
+public:
+    EventDataInt(
+        uint32              par_int ):
+            INIT_MEMBER( par_int )
+    {
+    }
+
+    uint32 get_par_int() const
+    {
+        return par_int_;
+    }
+
+private:
+    uint32          par_int_;
+};
+
+
+
 
 class BasicCallEvent: public Event
 {
@@ -57,7 +96,7 @@ private:
     uint32          call_id_;
 };
 
-class BasicCallParamEvent: public BasicCallEvent
+class BasicCallParamEvent: public BasicCallEvent, public EventDataInt
 {
 public:
     BasicCallParamEvent(
@@ -65,20 +104,12 @@ public:
         uint32              call_id,
         uint32              par_int ):
             BasicCallEvent( type, call_id ),
-            INIT_MEMBER( par_int )
+            EventDataInt( par_int )
     {
     }
-
-    uint32 get_par_int() const
-    {
-        return par_int_;
-    }
-
-private:
-    uint32          par_int_;
 };
 
-class BasicCallParamStrEvent: public BasicCallEvent
+class BasicCallParamStrEvent: public BasicCallEvent, public EventDataStr
 {
 public:
     BasicCallParamStrEvent(
@@ -86,39 +117,23 @@ public:
         uint32              call_id,
         const std::string   & par_str ):
             BasicCallEvent( type, call_id ),
-            INIT_MEMBER( par_str )
+            EventDataStr( par_str )
     {
     }
-
-    const std::string& get_par_str() const
-    {
-        return par_str_;
-    }
-
-private:
-    std::string     par_str_;
 };
 
 
 
-class BasicParamEvent: public Event
+class BasicParamEvent: public Event, public EventDataStr
 {
 public:
     BasicParamEvent(
         Event::type_e       type,
         const std::string   & par_str ):
             Event( type ),
-            INIT_MEMBER( par_str )
+            EventDataStr( par_str )
     {
     }
-
-    const std::string& get_par_str() const
-    {
-        return par_str_;
-    }
-
-private:
-    std::string     par_str_;
 };
 
 
@@ -235,6 +250,19 @@ public:
 
 private:
     call_status_e   call_s_;
+};
+
+class CallPstnStatusEvent: public BasicCallParamEvent, public EventDataStr
+{
+public:
+    CallPstnStatusEvent(
+        uint32              call_id,
+        uint32              errorcode,
+        const std::string   & descr ):
+            BasicCallParamEvent( Event::CALL_PSTN_STATUS, call_id, errorcode ),
+            EventDataStr( descr )
+    {
+    }
 };
 
 class CallFailureReasonEvent: public BasicCallParamEvent

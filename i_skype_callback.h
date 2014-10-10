@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: i_skype_callback.h 451 2014-04-29 17:49:24Z serge $
+// $Id: i_skype_callback.h 1130 2014-10-10 17:33:07Z serge $
 
 #ifndef I_EVENT_HANDLER_H
 #define I_EVENT_HANDLER_H
@@ -47,6 +47,7 @@ public:
     virtual void on_unknown( const std::string & /*g*/ )                            {};
 
     virtual void on_call_status( const uint32 /*n*/, const call_status_e /*s*/ )    {};
+    virtual void on_call_pstn_status( const uint32 /*n*/, const uint32 /*s*/, const std::string & /*descr*/ )    {};
     virtual void on_call_duration( const uint32 /*n*/, const uint32 /*t*/ )         {};
     virtual void on_call_failure_reason( const uint32 /*n*/, const uint32 /*t*/ )   {};
     virtual void on_call_vaa_input_status( const uint32 /*n*/, const uint32 /*s*/ ) {};
