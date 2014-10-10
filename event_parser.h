@@ -1,6 +1,6 @@
 /*
 
-Event parser.
+Event* parser.
 
 Copyright (C) 2014 Sergey Kolevatov
 
@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event_parser.h 1103 2014-10-07 18:12:21Z serge $
+// $Id: event_parser.h 1118 2014-10-09 18:41:01Z serge $
 
 #ifndef EVENT_PARSER_H
 #define EVENT_PARSER_H
@@ -29,9 +29,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <stdexcept>                // std::runtime_error
 
 #include "namespace_skypewrap.h"    // NAMESPACE_SKYPE_WRAP_START
-#include "event.h"                  // Event
 
 NAMESPACE_SKYPE_WRAP_START
+
+class Event;
 
 class EventParser
 {
@@ -44,23 +45,23 @@ public:
     };
 
 public:
-    static Event to_event( const std::string & s );
+    static Event* to_event( const std::string & s );
 
 private:
 
-    static Event create_unknown( const std::string & s );
+    static Event* create_unknown( const std::string & s );
 
-    static Event handle_tokens( const std::vector< std::string > & toks, const std::string & s );
+    static Event* handle_tokens( const std::vector< std::string > & toks, const std::string & s );
 
-    static Event handle_tokens__throwing( const std::vector< std::string > & toks, const std::string & s );
+    static Event* handle_tokens__throwing( const std::vector< std::string > & toks, const std::string & s );
 
-    static Event handle_connstatus( const std::vector< std::string > & toks );
-    static Event handle_userstatus( const std::vector< std::string > & toks );
-    static Event handle_currentuserhandle( const std::vector< std::string > & toks );
-    static Event handle_call( const std::vector< std::string > & toks );
-    static Event handle_alter_call( const std::vector< std::string > & toks );
-    static Event handle_chat( const std::vector< std::string > & toks );
-    static Event handle_chatmember( const std::vector< std::string > & toks );
+    static Event* handle_connstatus( const std::vector< std::string > & toks );
+    static Event* handle_userstatus( const std::vector< std::string > & toks );
+    static Event* handle_currentuserhandle( const std::vector< std::string > & toks );
+    static Event* handle_call( const std::vector< std::string > & toks );
+    static Event* handle_alter_call( const std::vector< std::string > & toks );
+    static Event* handle_chat( const std::vector< std::string > & toks );
+    static Event* handle_chatmember( const std::vector< std::string > & toks );
 };
 
 NAMESPACE_SKYPE_WRAP_END

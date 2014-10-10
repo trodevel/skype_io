@@ -19,14 +19,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event.h 1103 2014-10-07 18:12:21Z serge $
+// $Id: event.h 1117 2014-10-09 18:40:22Z serge $
 
 #ifndef EVENT_H
 #define EVENT_H
-
-#include <string>                   // std::string
-
-#include "parser_types.h"           // user_status_e, conn_status_e, call_status_e
 
 #include "namespace_skypewrap.h"    // NAMESPACE_SKYPE_WRAP_START
 
@@ -46,6 +42,7 @@ public:
         CALL,
         CALL_DURATION,
         CALL_STATUS,
+        CALL_PSTN_STATUS,
         CALL_FAILUREREASON,
         CHAT,
         CHATMEMBER,
@@ -59,40 +56,14 @@ public:
     };
 
 public:
-    Event();
-
     Event(
-        Event::type_e       id,
-        const std::string   & unk,
-        const std::string   & par_str,
-        uint32              par_int,
-        uint32              call_id,
-        conn_status_e       conn_s,
-        user_status_e       user_s,
-        call_status_e       call_s );
+        Event::type_e       type );
 
-    type_e get_id() const;
-    uint32 get_call_id() const;
-    call_status_e get_call_s() const;
-    conn_status_e get_conn_s() const;
-    uint32 get_par_int() const;
-    const std::string& get_par_str() const;
-    const std::string& get_unk() const;
-    user_status_e get_user_s() const;
+    type_e get_type() const;
 
 private:
 
-private:
-
-    type_e          id_;
-
-    std::string     unk_;
-    std::string     par_str_;
-    uint32          par_int_;
-    uint32          call_id_;
-    conn_status_e   conn_s_;
-    user_status_e   user_s_;
-    call_status_e   call_s_;
+    type_e          type_;
 };
 
 NAMESPACE_SKYPE_WRAP_END

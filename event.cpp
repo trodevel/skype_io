@@ -19,85 +19,24 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event.cpp 1097 2014-10-01 18:59:43Z serge $
+// $Id: event.cpp 1117 2014-10-09 18:40:22Z serge $
 
-#include "event.h"                  // user_status_e, conn_status_e, call_status_e
+#include "event.h"                  // self
 
 #include "namespace_skypewrap.h"    // NAMESPACE_SKYPE_WRAP_START
 #include "../utils/init_member.h"   // INIT_MEMBER
 
 NAMESPACE_SKYPE_WRAP_START
 
-
-Event::Event():
-    id_( UNDEF ),
-    par_int_( 0 ),
-    call_id_( 0 ),
-    conn_s_( conn_status_e::NONE ),
-    user_s_( user_status_e::NONE ),
-    call_s_( call_status_e::NONE )
-{
-}
-
 Event::Event(
-    Event::type_e       id,
-    const std::string   & unk,
-    const std::string   & par_str,
-    uint32              par_int,
-    uint32              call_id,
-    conn_status_e       conn_s,
-    user_status_e       user_s,
-    call_status_e       call_s ):
-    INIT_MEMBER( id ),
-    INIT_MEMBER( unk ),
-    INIT_MEMBER( par_str ),
-    INIT_MEMBER( par_int ),
-    INIT_MEMBER( call_id ),
-    INIT_MEMBER( conn_s ),
-    INIT_MEMBER( user_s ),
-    INIT_MEMBER( call_s )
+    Event::type_e       type ):
+    INIT_MEMBER( type )
 {
 }
 
-
-Event::type_e Event::get_id() const
+Event::type_e Event::get_type() const
 {
-    return id_;
-}
-
-uint32 Event::get_call_id() const
-{
-    return call_id_;
-}
-
-call_status_e Event::get_call_s() const
-{
-    return call_s_;
-}
-
-conn_status_e Event::get_conn_s() const
-{
-    return conn_s_;
-}
-
-uint32 Event::get_par_int() const
-{
-    return par_int_;
-}
-
-const std::string& Event::get_par_str() const
-{
-    return par_str_;
-}
-
-const std::string& Event::get_unk() const
-{
-    return unk_;
-}
-
-user_status_e Event::get_user_s() const
-{
-    return user_s_;
+    return type_;
 }
 
 NAMESPACE_SKYPE_WRAP_END

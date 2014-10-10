@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event_gen.cpp 1103 2014-10-07 18:12:21Z serge $
+// $Id: event_gen.cpp 1119 2014-10-09 18:41:44Z serge $
 
 #include "event_gen.h"       // self
 
@@ -30,6 +30,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/assert.hpp>     // BOOST_ASSERT
 
 #include "event_parser.h"       // EventParser
+#include "events.h"             // CallEvent, etc.
+
 #include "../utils/wrap_mutex.h"    // SCOPE_LOCK
 
 NAMESPACE_SKYPE_WRAP_START
@@ -58,46 +60,46 @@ bool EventGen::register_handler( ISkypeCallback * eh )
 
 void EventGen::handle( const std::string & s )
 {
-    Event ev = EventParser::to_event( s );
+    Event *ev = EventParser::to_event( s );
 
-    Event::type_e id = ev.get_id();
+    Event::type_e id = ev->get_type();
 
     SCOPE_LOCK( mutex_ );
 
     switch( id )
     {
     case Event::CONNSTATUS:
-        std::for_each( ev_.begin(), ev_.end(), boost::bind( &ISkypeCallback::on_conn_status, _1, ev.get_conn_s() ));
+        std::for_each( ev_.begin(), ev_.end(), boost::bind( &ISkypeCallback::on_conn_status, _1, static_cast<ConnStatusEvent*>( ev )->get_conn_s() ));
         break;
 
     case Event::USERSTATUS:
-        std::for_each( ev_.begin(), ev_.end(), boost::bind( &ISkypeCallback::on_user_status, _1, ev.get_user_s() ));
+        std::for_each( ev_.begin(), ev_.end(), boost::bind( &ISkypeCallback::on_user_status, _1, static_cast<UserStatusEvent*>( ev )->get_user_s() ));
         break;
 
     case Event::CURRENTUSERHANDLE:
-        std::for_each( ev_.begin(), ev_.end(), boost::bind( &ISkypeCallback::on_current_user_handle, _1, ev.get_par_str() ));
+        std::for_each( ev_.begin(), ev_.end(), boost::bind( &ISkypeCallback::on_current_user_handle, _1, static_cast<CurrentUserHandleEvent*>( ev )->get_par_str() ));
         break;
 
     case Event::USER_ONLINE_STATUS:
-        std::for_each( ev_.begin(), ev_.end(), boost::bind( &ISkypeCallback::on_user_online_status, _1, ev.get_par_str(), ev.get_user_s() ));
+        std::for_each( ev_.begin(), ev_.end(), boost::bind( &ISkypeCallback::on_user_online_status, _1, static_cast<UserOnlineStatusEvent*>( ev )->get_par_str(), static_cast<UserOnlineStatusEvent*>( ev )->get_user_s() ));
         break;
 
     case Event::CALL:
         break;
     case Event::CALL_DURATION:
-        std::for_each( ev_.begin(), ev_.end(), boost::bind( &ISkypeCallback::on_call_duration, _1, ev.get_call_id(), ev.get_par_int() ));
+        std::for_each( ev_.begin(), ev_.end(), boost::bind( &ISkypeCallback::on_call_duration, _1, static_cast<CallDurationEvent*>( ev )->get_call_id(), static_cast<CallDurationEvent*>( ev )->get_par_int() ));
         break;
 
     case Event::CALL_STATUS:
-        std::for_each( ev_.begin(), ev_.end(), boost::bind( &ISkypeCallback::on_call_status, _1, ev.get_call_id(), ev.get_call_s() ));
+        std::for_each( ev_.begin(), ev_.end(), boost::bind( &ISkypeCallback::on_call_status, _1, static_cast<CallStatusEvent*>( ev )->get_call_id(), static_cast<CallStatusEvent*>( ev )->get_call_s() ));
         break;
 
     case Event::CALL_FAILUREREASON:
-        std::for_each( ev_.begin(), ev_.end(), boost::bind( &ISkypeCallback::on_call_failure_reason, _1, ev.get_call_id(), ev.get_par_int() ));
+        std::for_each( ev_.begin(), ev_.end(), boost::bind( &ISkypeCallback::on_call_failure_reason, _1, static_cast<CallFailureReasonEvent*>( ev )->get_call_id(), static_cast<CallFailureReasonEvent*>( ev )->get_par_int() ));
         break;
 
     case Event::CALL_VAA_INPUT_STATUS:
-        std::for_each( ev_.begin(), ev_.end(), boost::bind( &ISkypeCallback::on_call_vaa_input_status, _1, ev.get_call_id(), ev.get_par_int() ));
+        std::for_each( ev_.begin(), ev_.end(), boost::bind( &ISkypeCallback::on_call_vaa_input_status, _1, static_cast<CallVaaInputStatusEvent*>( ev )->get_call_id(), static_cast<CallVaaInputStatusEvent*>( ev )->get_par_int() ));
         break;
 
     case Event::UNDEF:
@@ -113,6 +115,8 @@ void EventGen::handle( const std::string & s )
         std::for_each( ev_.begin(), ev_.end(), boost::bind( &ISkypeCallback::on_unknown, _1, s ));
         break;
     }
+
+    delete ev;
 }
 
 

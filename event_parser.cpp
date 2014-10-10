@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event_parser.cpp 1103 2014-10-07 18:12:21Z serge $
+// $Id: event_parser.cpp 1118 2014-10-09 18:41:01Z serge $
 
 #include "event_parser.h"       // self
 
@@ -28,6 +28,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <sstream>              // std::ostringstream
 #include <boost/lexical_cast.hpp>   // lexical_cast
 
+#include "events.h"                 // Event
 #include "../utils/tokenizer.h"     //
 
 NAMESPACE_SKYPE_WRAP_START
@@ -39,6 +40,7 @@ NAMESPACE_SKYPE_WRAP_START
 #define KEYW_CHAT                   "CHAT"
 #define KEYW_CHATMEMBER             "CHATMEMBER"
 #define KEYW_DURATION               "DURATION"
+#define KEYW_PSTN_STATUS            "PSTN_STATUS"
 #define KEYW_STATUS                 "STATUS"
 #define KEYW_FAILUREREASON          "FAILUREREASON"
 #define KEYW_ALTER                  "ALTER"
@@ -49,7 +51,7 @@ NAMESPACE_SKYPE_WRAP_START
 #define KEYW_TRUE                   "TRUE"
 #define KEYW_FALSE                  "FALSE"
 
-Event EventParser::to_event( const std::string & s )
+Event* EventParser::to_event( const std::string & s )
 {
     std::vector< std::string > toks;
 
@@ -62,7 +64,7 @@ Event EventParser::to_event( const std::string & s )
 /**
  * @param s original string
  */
-Event EventParser::handle_tokens( const std::vector< std::string > & toks, const std::string & s )
+Event* EventParser::handle_tokens( const std::vector< std::string > & toks, const std::string & s )
 {
     try
     {
@@ -73,21 +75,19 @@ Event EventParser::handle_tokens( const std::vector< std::string > & toks, const
         std::cerr << "exception - " << e.what() << std::endl;
     }
 
-    return Event();
+    return nullptr;
 }
 
-Event EventParser::create_unknown( const std::string & s )
+Event* EventParser::create_unknown( const std::string & s )
 {
     static std::string  dummy_s;
-    return Event( Event::UNKNOWN, s, dummy_s, 0, 0, conn_status_e::NONE, user_status_e::NONE, call_status_e::NONE );
+    return new Event( Event::UNKNOWN );
 }
 
-Event EventParser::handle_tokens__throwing( const std::vector< std::string > & toks, const std::string & s )
+Event* EventParser::handle_tokens__throwing( const std::vector< std::string > & toks, const std::string & s )
 {
-    static Event        ev_dummy;
-
     if( toks.empty() )
-        return ev_dummy;
+        return new Event( Event::UNKNOWN );
 
     const std::string & keyw = toks[0];
 
@@ -130,40 +130,34 @@ Event EventParser::handle_tokens__throwing( const std::vector< std::string > & t
 
 }
 
-Event EventParser::handle_connstatus( const std::vector< std::string > & toks )
+Event* EventParser::handle_connstatus( const std::vector< std::string > & toks )
 {
     if( toks.size() != 2 )
         throw WrongFormat( "expected 2 token(s)" );
 
     conn_status_e c = to_conn_status( toks[1] );
 
-    std::string dummy_s;
-
-    return Event( Event::CONNSTATUS, dummy_s, dummy_s, 0, 0, c, user_status_e::NONE, call_status_e::NONE );
+    return new ConnStatusEvent( c );
 }
-Event EventParser::handle_userstatus( const std::vector< std::string > & toks )
+Event* EventParser::handle_userstatus( const std::vector< std::string > & toks )
 {
     if( toks.size() != 2 )
         throw WrongFormat( "expected 2 token(s)" );
 
     user_status_e c = to_user_status( toks[1] );
 
-    std::string dummy_s;
-
-    return Event( Event::USERSTATUS, dummy_s, dummy_s, 0, 0, conn_status_e::NONE, c, call_status_e::NONE );
+    return new UserStatusEvent( c );
 }
-Event EventParser::handle_currentuserhandle( const std::vector< std::string > & toks )
+Event* EventParser::handle_currentuserhandle( const std::vector< std::string > & toks )
 {
     if( toks.size() != 2 )
         throw WrongFormat( "expected 2 token(s)" );
 
     const std::string & s = toks[1];
 
-    std::string dummy_s;
-
-    return Event( Event::CURRENTUSERHANDLE, dummy_s, s, 0, 0, conn_status_e::NONE, user_status_e::NONE, call_status_e::NONE );
+    return new CurrentUserHandleEvent( s );
 }
-Event EventParser::handle_call( const std::vector< std::string > & toks )
+Event* EventParser::handle_call( const std::vector< std::string > & toks )
 {
     if( toks.size() < 4 )
         throw WrongFormat( "expected at least 4 token(s)" );
@@ -184,7 +178,7 @@ Event EventParser::handle_call( const std::vector< std::string > & toks )
 
         std::string dummy_s;
 
-        return Event( Event::CALL_DURATION, dummy_s, dummy_s, dur, call_id, conn_status_e::NONE, user_status_e::NONE, call_status_e::NONE );
+        return new CallDurationEvent( call_id, dur );
     }
     else if( keyw2 == KEYW_STATUS )
     {
@@ -193,9 +187,16 @@ Event EventParser::handle_call( const std::vector< std::string > & toks )
 
         call_status_e s = to_call_status( toks[3] );
 
-        std::string dummy_s;
+        return new CallStatusEvent( call_id, s );
+    }
+    else if( keyw2 == KEYW_PSTN_STATUS )
+    {
+        if( toks[3].empty() )
+            throw WrongFormat( "PSTN_STATUS is empty" );
 
-        return Event( Event::CALL_STATUS, dummy_s, dummy_s, 0, call_id, conn_status_e::NONE, user_status_e::NONE, s );
+        uint32 error = boost::lexical_cast< uint32 >( toks[3] );
+
+        return new BasicCallParamEvent( Event::CALL_PSTN_STATUS, call_id, error );
     }
     else if( keyw2 == KEYW_VAA_INPUT_STATUS )
     {
@@ -210,7 +211,7 @@ Event EventParser::handle_call( const std::vector< std::string > & toks )
 
         std::string dummy_s;
 
-        return Event( Event::CALL_VAA_INPUT_STATUS, dummy_s, dummy_s, s, call_id, conn_status_e::NONE, user_status_e::NONE, call_status_e::NONE );
+        return new CallVaaInputStatusEvent( call_id, s );
     }
     else if( keyw2 == KEYW_FAILUREREASON )
     {
@@ -219,17 +220,13 @@ Event EventParser::handle_call( const std::vector< std::string > & toks )
 
         uint32 c = boost::lexical_cast< uint32 >( toks[3] );
 
-        std::string dummy_s;
-
-        return Event( Event::CALL_FAILUREREASON, dummy_s, dummy_s, c, call_id, conn_status_e::NONE, user_status_e::NONE, call_status_e::NONE );
+        return new CallFailureReasonEvent( call_id, c );
     }
 
-    std::string dummy_s;
-
-    return Event( Event::UNKNOWN, keyw2, dummy_s, 0, 0, conn_status_e::NONE, user_status_e::NONE, call_status_e::NONE );
+    return new BasicParamEvent( Event::UNKNOWN, keyw2 );
 }
 
-Event EventParser::handle_alter_call( const std::vector< std::string > & toks )
+Event* EventParser::handle_alter_call( const std::vector< std::string > & toks )
 {
     // ALTER CALL 846 SET_INPUT file="c:\test.wav"
 
@@ -252,27 +249,23 @@ Event EventParser::handle_alter_call( const std::vector< std::string > & toks )
             throw WrongFormat( "badly formed parameters - " + toks[4] );
 
         if( pars[0] == KEYW_FILE )
-            return Event( is_input?
+            return new BasicCallParamStrEvent( is_input?
                     Event::ALTER_CALL_SET_INPUT_FILE :
                     Event::ALTER_CALL_SET_OUTPUT_FILE,
-                    pars[1], "", 0, call_id, conn_status_e::NONE, user_status_e::NONE, call_status_e::NONE );
+                    call_id, pars[1] );
     }
 
     return create_unknown( toks[3] );
 }
 
-Event EventParser::handle_chat( const std::vector< std::string > & toks )
+Event* EventParser::handle_chat( const std::vector< std::string > & toks )
 {
-    std::string dummy_s;
-
-    return Event( Event::CHAT, dummy_s, dummy_s, 0, 0, conn_status_e::NONE, user_status_e::NONE, call_status_e::NONE );
+    return new Event( Event::CHAT );
 }
 
-Event EventParser::handle_chatmember( const std::vector< std::string > & toks )
+Event* EventParser::handle_chatmember( const std::vector< std::string > & toks )
 {
-    std::string dummy_s;
-
-    return Event( Event::CHATMEMBER, dummy_s, dummy_s, 0, 0, conn_status_e::NONE, user_status_e::NONE, call_status_e::NONE );
+    return new Event( Event::CHATMEMBER );
 }
 
 NAMESPACE_SKYPE_WRAP_END
