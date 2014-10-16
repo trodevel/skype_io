@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event_parser.h 1118 2014-10-09 18:41:01Z serge $
+// $Id: event_parser.h 1150 2014-10-16 17:57:10Z serge $
 
 #ifndef EVENT_PARSER_H
 #define EVENT_PARSER_H
@@ -58,6 +58,7 @@ private:
     static Event* handle_connstatus( const std::vector< std::string > & toks );
     static Event* handle_userstatus( const std::vector< std::string > & toks );
     static Event* handle_currentuserhandle( const std::vector< std::string > & toks );
+    static Event* handle_error( const std::vector< std::string > & toks );
     static Event* handle_call( const std::vector< std::string > & toks );
     static Event* handle_alter_call( const std::vector< std::string > & toks );
     static Event* handle_chat( const std::vector< std::string > & toks );

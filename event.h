@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event.h 1117 2014-10-09 18:40:22Z serge $
+// $Id: event.h 1148 2014-10-16 17:48:01Z serge $
 
 #ifndef EVENT_H
 #define EVENT_H
@@ -35,6 +35,7 @@ public:
     {
         UNDEF = 0,
         UNKNOWN,
+        ERROR,
         CONNSTATUS,
         USERSTATUS,
         CURRENTUSERHANDLE,

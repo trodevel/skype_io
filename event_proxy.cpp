@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event_proxy.cpp 1131 2014-10-10 17:33:31Z serge $
+// $Id: event_proxy.cpp 1152 2014-10-16 18:18:55Z serge $
 
 #include "event_proxy.h"        // self
 
@@ -104,6 +104,10 @@ void EventProxy::handle( const std::string & s )
 
     case Event::CALL_VAA_INPUT_STATUS:
         std::for_each( ev_.begin(), ev_.end(), boost::bind( &ISkypeCallback::on_call_vaa_input_status, _1, static_cast<CallVaaInputStatusEvent*>( ev )->get_call_id(), static_cast<CallVaaInputStatusEvent*>( ev )->get_par_int() ));
+        break;
+
+    case Event::ERROR:
+        std::for_each( ev_.begin(), ev_.end(), boost::bind( &ISkypeCallback::on_error, _1, static_cast<ErrorEvent*>( ev )->get_par_int(), static_cast<ErrorEvent*>( ev )->get_par_str() ));
         break;
 
     case Event::UNDEF:

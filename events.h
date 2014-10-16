@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: events.h 1129 2014-10-10 17:32:51Z serge $
+// $Id: events.h 1149 2014-10-16 17:48:12Z serge $
 
 #ifndef EVENTS_H
 #define EVENTS_H
@@ -124,10 +124,24 @@ public:
 
 
 
-class BasicParamEvent: public Event, public EventDataStr
+class BasicParamEvent: public Event, public EventDataInt
 {
 public:
     BasicParamEvent(
+        Event::type_e       type,
+        uint32              par_int ):
+            Event( type ),
+            EventDataInt( par_int )
+    {
+    }
+};
+
+
+
+class BasicParamStrEvent: public Event, public EventDataStr
+{
+public:
+    BasicParamStrEvent(
         Event::type_e       type,
         const std::string   & par_str ):
             Event( type ),
@@ -136,6 +150,17 @@ public:
     }
 };
 
+class ErrorEvent: public BasicParamEvent, public EventDataStr
+{
+public:
+    ErrorEvent(
+        uint32              par_int,
+        const std::string   & par_str ):
+            BasicParamEvent( Event::ERROR, par_int ),
+            EventDataStr( par_str )
+    {
+    }
+};
 
 
 class ConnStatusEvent: public Event
@@ -179,24 +204,24 @@ private:
     user_status_e   user_s_;
 };
 
-class CurrentUserHandleEvent: public BasicParamEvent
+class CurrentUserHandleEvent: public BasicParamStrEvent
 {
 public:
     CurrentUserHandleEvent(
         const std::string   & par_str ):
-            BasicParamEvent( Event::CURRENTUSERHANDLE, par_str )
+            BasicParamStrEvent( Event::CURRENTUSERHANDLE, par_str )
     {
     }
 
 };
 
-class UserOnlineStatusEvent: public BasicParamEvent
+class UserOnlineStatusEvent: public BasicParamStrEvent
 {
 public:
     UserOnlineStatusEvent(
         const std::string   & par_str,
         user_status_e       user_s):
-            BasicParamEvent( Event::USER_ONLINE_STATUS, par_str ),
+            BasicParamStrEvent( Event::USER_ONLINE_STATUS, par_str ),
             INIT_MEMBER( user_s )
     {
     }

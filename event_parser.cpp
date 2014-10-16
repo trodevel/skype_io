@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event_parser.cpp 1132 2014-10-10 17:48:27Z serge $
+// $Id: event_parser.cpp 1151 2014-10-16 18:05:41Z serge $
 
 #include "event_parser.h"       // self
 
@@ -40,6 +40,7 @@ NAMESPACE_SKYPE_WRAP_START
 #define KEYW_CHAT                   "CHAT"
 #define KEYW_CHATMEMBER             "CHATMEMBER"
 #define KEYW_DURATION               "DURATION"
+#define KEYW_ERROR                  "ERROR"
 #define KEYW_PSTN_STATUS            "PSTN_STATUS"
 #define KEYW_STATUS                 "STATUS"
 #define KEYW_FAILUREREASON          "FAILUREREASON"
@@ -58,6 +59,26 @@ Event* EventParser::to_event( const std::string & s )
     tokenize_to_vector( toks, s, " " );
 
     return handle_tokens( toks, s );
+}
+
+std::string & join_tokens( std::string & res, const std::vector< std::string > & toks, int start_position )
+{
+    int size = (int) toks.size();
+
+    if( size <= start_position )
+        return res;
+
+    for( int i = start_position; i < size; ++i )
+    {
+        if( i != start_position )
+        {
+            res.append( " " );
+        }
+
+        res.append( toks[i] );
+    }
+
+    return res;
 }
 
 
@@ -105,6 +126,10 @@ Event* EventParser::handle_tokens__throwing( const std::vector< std::string > & 
     else if( keyw == KEYW_CALL )
     {
         return handle_call( toks );
+    }
+    else if( keyw == KEYW_ERROR )
+    {
+        return handle_error( toks );
     }
     else if( keyw == KEYW_CHAT )
     {
@@ -195,18 +220,7 @@ Event* EventParser::handle_call( const std::vector< std::string > & toks )
 
         std::string descr;
 
-        if( toks.size() > 4 )
-        {
-            for( int i = 4; i < (int) toks.size(); ++i )
-            {
-                if( i != 4 )
-                {
-                    descr.append( " " );
-                }
-
-                descr.append( toks[i] );
-            }
-        }
+        join_tokens( descr, toks, 4 );
 
         return new CallPstnStatusEvent( call_id, error, descr );
     }
@@ -233,7 +247,21 @@ Event* EventParser::handle_call( const std::vector< std::string > & toks )
         return new CallFailureReasonEvent( call_id, c );
     }
 
-    return new BasicParamEvent( Event::UNKNOWN, keyw2 );
+    return new BasicParamStrEvent( Event::UNKNOWN, keyw2 );
+}
+
+Event* EventParser::handle_error( const std::vector< std::string > & toks )
+{
+    if( toks.size() < 2 )
+        throw WrongFormat( "expected at least 2 token(s)" );
+
+    uint32 error = boost::lexical_cast< uint32 >( toks[1] );
+
+    std::string descr;
+
+    join_tokens( descr, toks, 2 );
+
+    return new ErrorEvent( error, descr );
 }
 
 Event* EventParser::handle_alter_call( const std::vector< std::string > & toks )
