@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: dbus_proxy.h 396 2014-04-18 23:45:14Z serge $
+// $Id: dbus_proxy.h 1359 2015-01-09 18:17:09Z serge $
 
 #ifndef DBUS_PROXY_H
 #define DBUS_PROXY_H
@@ -30,7 +30,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <stdexcept>                // std::runtime_error
 #include <boost/thread.hpp>         // boost::mutex
 
-#include "namespace_skypewrap.h"    // NAMESPACE_SKYPE_WRAP_START
+#include "namespace_lib.h"          // NAMESPACE_SKYPE_WRAP_START
 
 NAMESPACE_SKYPE_WRAP_START
 

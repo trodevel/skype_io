@@ -19,11 +19,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event.cpp 1117 2014-10-09 18:40:22Z serge $
+// $Id: event.cpp 1359 2015-01-09 18:17:09Z serge $
 
 #include "event.h"                  // self
 
-#include "namespace_skypewrap.h"    // NAMESPACE_SKYPE_WRAP_START
+#include "namespace_lib.h"          // NAMESPACE_SKYPE_WRAP_START
 #include "../utils/init_member.h"   // INIT_MEMBER
 
 NAMESPACE_SKYPE_WRAP_START

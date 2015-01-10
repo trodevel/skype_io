@@ -19,17 +19,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event_proxy.h 1122 2014-10-10 17:13:22Z serge $
+// $Id: event_proxy.h 1357 2015-01-09 18:08:15Z serge $
 
 #ifndef EVENT_PROXY_H
 #define EVENT_PROXY_H
 
-#include <string>                   // std::string
-#include <vector>                   // std::vector
-#include <stdexcept>                // std::runtime_error
 #include <boost/thread.hpp>         // boost::mutex
 
-#include "namespace_skypewrap.h"    // NAMESPACE_SKYPE_WRAP_START
 #include "i_observer.h"             // IObserver
 #include "i_skype_callback.h"       // ISkypeCallback
 
@@ -42,12 +38,12 @@ public:
 
     virtual void handle( const std::string & s );
 
-    bool register_handler( ISkypeCallback * eh );
+    bool register_callback( ISkypeCallback * callback );
 
 private:
     mutable boost::mutex        mutex_;
 
-    std::vector< ISkypeCallback * >  ev_;
+    ISkypeCallback              * callback_;
 };
 
 NAMESPACE_SKYPE_WRAP_END

@@ -19,11 +19,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: str_helper.h 1105 2014-10-07 18:43:13Z serge $
+// $Id: str_helper.h 1359 2015-01-09 18:17:09Z serge $
 
 #include "parser_types.h"           // conn_status_e, user_status_e, call_status_e
 
-#include "namespace_skypewrap.h"    // NAMESPACE_SKYPE_WRAP_START
+#include "namespace_lib.h"          // NAMESPACE_SKYPE_WRAP_START
 
 NAMESPACE_SKYPE_WRAP_START
 

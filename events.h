@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: events.h 1149 2014-10-16 17:48:12Z serge $
+// $Id: events.h 1359 2015-01-09 18:17:09Z serge $
 
 #ifndef EVENTS_H
 #define EVENTS_H
@@ -30,7 +30,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include "parser_types.h"           // user_status_e, conn_status_e, call_status_e
 #include "../utils/init_member.h"   // INIT_MEMBER
 
-#include "namespace_skypewrap.h"    // NAMESPACE_SKYPE_WRAP_START
+#include "namespace_lib.h"          // NAMESPACE_SKYPE_WRAP_START
 
 NAMESPACE_SKYPE_WRAP_START
 

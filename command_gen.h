@@ -19,14 +19,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: command_gen.h 413 2014-04-22 23:28:03Z serge $
+// $Id: command_gen.h 1359 2015-01-09 18:17:09Z serge $
 
 #ifndef COMMAND_GEN_H
 #define COMMAND_GEN_H
 
 #include <string>                   // std::string
 
-#include "namespace_skypewrap.h"    // NAMESPACE_SKYPE_WRAP_START
+#include "namespace_lib.h"          // NAMESPACE_SKYPE_WRAP_START
 #include "parser_types.h"           // call_status_e
 
 NAMESPACE_SKYPE_WRAP_START

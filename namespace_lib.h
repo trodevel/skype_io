@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: namespace_skypewrap.h 391 2014-04-18 22:51:52Z serge $
+// $Id: namespace_lib.h 1359 2015-01-09 18:17:09Z serge $
 
 #ifndef NAMESPACE_SKYPEWRAP_H
 #define NAMESPACE_SKYPEWRAP_H

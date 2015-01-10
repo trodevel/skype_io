@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event_parser.h 1150 2014-10-16 17:57:10Z serge $
+// $Id: event_parser.h 1359 2015-01-09 18:17:09Z serge $
 
 #ifndef EVENT_PARSER_H
 #define EVENT_PARSER_H
@@ -28,7 +28,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <vector>                   // std::vector
 #include <stdexcept>                // std::runtime_error
 
-#include "namespace_skypewrap.h"    // NAMESPACE_SKYPE_WRAP_START
+#include "namespace_lib.h"          // NAMESPACE_SKYPE_WRAP_START
 
 NAMESPACE_SKYPE_WRAP_START
 

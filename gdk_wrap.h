@@ -19,12 +19,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: gdk_wrap.h 391 2014-04-18 22:51:52Z serge $
+// $Id: gdk_wrap.h 1359 2015-01-09 18:17:09Z serge $
 
 #ifndef GDK_WRAP_H
 #define GDK_WRAP_H
 
-#include "namespace_skypewrap.h"    // NAMESPACE_SKYPE_WRAP_START
+#include "namespace_lib.h"          // NAMESPACE_SKYPE_WRAP_START
 
 NAMESPACE_SKYPE_WRAP_START
 

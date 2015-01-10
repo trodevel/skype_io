@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: skype_io.h 1124 2014-10-10 17:13:49Z serge $
+// $Id: skype_io.h 1359 2015-01-09 18:17:09Z serge $
 
 #ifndef SKYPE_IO_H
 #define SKYPE_IO_H
@@ -28,10 +28,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <boost/thread.hpp>         // boost::mutex
 
 #include "../threcon/i_controllable.h"      // IControllable
+#include "../utils/types.h"         // uint32
 
-#include "namespace_skypewrap.h"    // NAMESPACE_SKYPE_WRAP_START
+#include "namespace_lib.h"          // NAMESPACE_SKYPE_WRAP_START
 #include "skype_wrap.h"             // SkypeWrap
 #include "event_proxy.h"            // EventProxy
+#include "parser_types.h"           // call_status_e
 
 NAMESPACE_SKYPE_WRAP_START
 
@@ -49,7 +51,7 @@ public:
 
     bool is_inited() const;
 
-    bool register_handler( ISkypeCallback * eh );
+    bool register_callback( ISkypeCallback * eh );
 
     bool send_raw( const std::string & s, std::string & response );
 
