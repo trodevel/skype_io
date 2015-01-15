@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event_parser.h 1359 2015-01-09 18:17:09Z serge $
+// $Id: event_parser.h 1384 2015-01-14 18:18:57Z serge $
 
 #ifndef EVENT_PARSER_H
 #define EVENT_PARSER_H
@@ -51,9 +51,10 @@ private:
 
     static Event* create_unknown( const std::string & s );
 
-    static Event* handle_tokens( const std::vector< std::string > & toks, const std::string & s );
+    static Event* handle_tokens( std::vector< std::string > & toks, const std::string & s );
 
-    static Event* handle_tokens__throwing( const std::vector< std::string > & toks, const std::string & s );
+    static Event* handle_tokens__throwing( std::vector< std::string > & toks, const std::string & s );
+    static void get_keyw_and_command_id( std::vector< std::string > & toks, std::string & keyw, std::string & id );
 
     static Event* handle_connstatus( const std::vector< std::string > & toks );
     static Event* handle_userstatus( const std::vector< std::string > & toks );

@@ -19,14 +19,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event_parser.cpp 1151 2014-10-16 18:05:41Z serge $
+// $Id: event_parser.cpp 1386 2015-01-14 18:25:47Z serge $
 
 #include "event_parser.h"       // self
 
-#include <boost/assert.hpp>     // BOOST_ASSERT
-#include <iostream>             // cout
-#include <sstream>              // std::ostringstream
-#include <boost/lexical_cast.hpp>   // lexical_cast
+#include <iostream>             // cerr
 
 #include "events.h"                 // Event
 #include "../utils/tokenizer.h"     //
@@ -85,7 +82,7 @@ std::string & join_tokens( std::string & res, const std::vector< std::string > &
 /**
  * @param s original string
  */
-Event* EventParser::handle_tokens( const std::vector< std::string > & toks, const std::string & s )
+Event* EventParser::handle_tokens( std::vector< std::string > & toks, const std::string & s )
 {
     try
     {
@@ -99,17 +96,36 @@ Event* EventParser::handle_tokens( const std::vector< std::string > & toks, cons
     return nullptr;
 }
 
+void EventParser::get_keyw_and_command_id( std::vector< std::string > & toks, std::string & keyw, std::string & id )
+{
+    if( toks[0].empty() )
+        return;
+
+    if( toks[0][0] == '#' )
+    {
+        id = toks[0];
+        toks.erase( toks.begin() );
+    }
+
+    if( toks.empty() )
+        return;
+
+    keyw    = toks[0];
+}
+
 Event* EventParser::create_unknown( const std::string & s )
 {
     return new Event( Event::UNKNOWN );
 }
 
-Event* EventParser::handle_tokens__throwing( const std::vector< std::string > & toks, const std::string & s )
+Event* EventParser::handle_tokens__throwing( std::vector< std::string > & toks, const std::string & s )
 {
     if( toks.empty() )
         return new Event( Event::UNKNOWN );
 
-    const std::string & keyw = toks[0];
+    std::string keyw;
+    std::string id;
+    get_keyw_and_command_id( toks, keyw, id );
 
     if( keyw == KEYW_CONNSTATUS )
     {
@@ -189,7 +205,7 @@ Event* EventParser::handle_call( const std::vector< std::string > & toks )
     if( toks[1].empty() )
         throw WrongFormat( "CALL_ID is not defined" );
 
-    uint32 call_id = boost::lexical_cast< uint32 >( toks[1] );
+    uint32 call_id = std::stoul( toks[1] );
 
     const std::string keyw2 = toks[2];
 
@@ -198,7 +214,7 @@ Event* EventParser::handle_call( const std::vector< std::string > & toks )
         if( toks[3].empty() )
             throw WrongFormat( "DURATION is empty" );
 
-        uint32 dur = boost::lexical_cast< uint32 >( toks[3] );
+        uint32 dur = std::stoul( toks[3] );
 
         return new CallDurationEvent( call_id, dur );
     }
@@ -216,7 +232,7 @@ Event* EventParser::handle_call( const std::vector< std::string > & toks )
         if( toks[3].empty() )
             throw WrongFormat( "PSTN_STATUS is empty" );
 
-        uint32 error = boost::lexical_cast< uint32 >( toks[3] );
+        uint32 error = std::stoul( toks[3] );
 
         std::string descr;
 
@@ -242,7 +258,7 @@ Event* EventParser::handle_call( const std::vector< std::string > & toks )
         if( toks[3].empty() )
             throw WrongFormat( "FAILUREREASON is empty" );
 
-        uint32 c = boost::lexical_cast< uint32 >( toks[3] );
+        uint32 c = std::stoul( toks[3] );
 
         return new CallFailureReasonEvent( call_id, c );
     }
@@ -255,7 +271,7 @@ Event* EventParser::handle_error( const std::vector< std::string > & toks )
     if( toks.size() < 2 )
         throw WrongFormat( "expected at least 2 token(s)" );
 
-    uint32 error = boost::lexical_cast< uint32 >( toks[1] );
+    uint32 error = std::stoul( toks[1] );
 
     std::string descr;
 
@@ -274,7 +290,7 @@ Event* EventParser::handle_alter_call( const std::vector< std::string > & toks )
     if( toks[2].empty() )
         throw WrongFormat( "CALL_ID is not defined" );
 
-    uint32 call_id = boost::lexical_cast< uint32 >( toks[2] );
+    uint32 call_id = std::stoul( toks[2] );
 
     std::vector< std::string > pars;
     tokenize_to_vector( pars, toks[4], "=" );
