@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: events.h 1359 2015-01-09 18:17:09Z serge $
+// $Revision: 1404 $ $Date:: 2015-01-16 #$ $Author: serge $
 
 #ifndef EVENTS_H
 #define EVENTS_H
@@ -28,7 +28,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "event.h"                  // Event
 #include "parser_types.h"           // user_status_e, conn_status_e, call_status_e
-#include "../utils/init_member.h"   // INIT_MEMBER
 
 #include "namespace_lib.h"          // NAMESPACE_SKYPE_WRAP_START
 
@@ -39,7 +38,7 @@ class EventDataStr
 public:
     EventDataStr(
         const std::string   & par_str ):
-            INIT_MEMBER( par_str )
+            par_str_( par_str )
     {
     }
 
@@ -57,7 +56,7 @@ class EventDataInt
 public:
     EventDataInt(
         uint32              par_int ):
-            INIT_MEMBER( par_int )
+            par_int_( par_int )
     {
     }
 
@@ -169,7 +168,7 @@ public:
     ConnStatusEvent(
         conn_status_e       conn_s ):
         Event( Event::CONNSTATUS ),
-        INIT_MEMBER( conn_s )
+        conn_s_( conn_s )
     {
     }
 
@@ -189,7 +188,7 @@ public:
     UserStatusEvent(
         user_status_e       user_s ):
         Event( Event::USERSTATUS ),
-        INIT_MEMBER( user_s )
+        user_s_( user_s )
     {
     }
 
@@ -222,7 +221,7 @@ public:
         const std::string   & par_str,
         user_status_e       user_s):
             BasicParamStrEvent( Event::USER_ONLINE_STATUS, par_str ),
-            INIT_MEMBER( user_s )
+            user_s_( user_s )
     {
     }
 
@@ -263,7 +262,7 @@ public:
         uint32              call_id,
         call_status_e       call_s ):
             BasicCallEvent( Event::CALL_STATUS, call_id ),
-            INIT_MEMBER( call_s )
+            call_s_( call_s )
     {
     }
 

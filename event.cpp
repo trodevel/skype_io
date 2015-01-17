@@ -19,18 +19,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event.cpp 1359 2015-01-09 18:17:09Z serge $
+// $Revision: 1404 $ $Date:: 2015-01-16 #$ $Author: serge $
 
 #include "event.h"                  // self
 
 #include "namespace_lib.h"          // NAMESPACE_SKYPE_WRAP_START
-#include "../utils/init_member.h"   // INIT_MEMBER
 
 NAMESPACE_SKYPE_WRAP_START
 
 Event::Event(
     Event::type_e       type ):
-    INIT_MEMBER( type )
+    type_( type )
 {
 }
 

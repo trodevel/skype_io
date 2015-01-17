@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: skype_wrap.h 1359 2015-01-09 18:17:09Z serge $
+// $Revision: 1404 $ $Date:: 2015-01-16 #$ $Author: serge $
 
 #ifndef SKYPE_WRAP_H
 #define SKYPE_WRAP_H

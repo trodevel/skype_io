@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Id: event_proxy.h 1357 2015-01-09 18:08:15Z serge $
+// $Revision: 1404 $ $Date:: 2015-01-16 #$ $Author: serge $
 
 #ifndef EVENT_PROXY_H
 #define EVENT_PROXY_H
