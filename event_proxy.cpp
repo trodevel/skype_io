@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1404 $ $Date:: 2015-01-16 #$ $Author: serge $
+// $Revision: 1665 $ $Date:: 2015-03-31 #$ $Author: serge $
 
 #include "event_proxy.h"        // self
 
@@ -54,6 +54,8 @@ bool EventProxy::register_callback( ISkypeCallback * callback )
 
 void EventProxy::handle( const std::string & s )
 {
+    std::cout << "EventProxy::handle: " << s << std::endl;
+
     Event *ev = EventParser::to_event( s );
 
     SCOPE_LOCK( mutex_ );

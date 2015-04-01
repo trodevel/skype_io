@@ -19,22 +19,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1404 $ $Date:: 2015-01-16 #$ $Author: serge $
+// $Revision: 1683 $ $Date:: 2015-03-31 #$ $Author: serge $
 
 #include "skype_wrap.h"     // self
 
-#include "dbus.h"         // DBus
-#include "dbus_proxy.h"         // DBusProxy
-#include "skype_service_c.h"    // SkypeServiceC
-#include "gdk_wrap.h"           // GdkWrap
+#include <sstream>              // std::stringstream
+#include <cstring>              // strchr
+#include <iostream>             // cout
+#include <functional>           // std::bind
 
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
-#include <boost/assert.hpp>     // BOOST_ASSERT
-#include <iostream>         // cout
-
-#include "../utils/wrap_mutex.h"    // SCOPE_LOCK
+#include "../utils/mutex_helper.h"  // MUTEX_SCOPE_LOCK
 #include "../utils/dummy_logger.h"  // dummy_log
+#include "../utils/assert.h"        // ASSERT
 
 #define MODULENAME      "SkypeWrap"
 
@@ -42,138 +38,73 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 NAMESPACE_SKYPE_WRAP_START
 
 SkypeWrap::SkypeWrap():
-    dbus_( 0L ), proxy_( 0L ), service_( 0L ), is_inited_( false )
+    must_stop_( true ), dbus_( nullptr ), callback_( nullptr ), sequence_( 0 ), is_running_( false )
 {
 }
 
 SkypeWrap::~SkypeWrap()
 {
-    dummy_log( 0, MODULENAME, "~SkypeWrap()" );
+    dummy_log_debug( MODULENAME, "~SkypeWrap()" );
 
-    SCOPE_LOCK( mutex_ );
+    MUTEX_SCOPE_LOCK( mutex_ );
 
-    if( is_inited_ )
+    if( is_running_ )
+    {
         shutdown__();
-
-    if( service_ )
-    {
-        delete service_;
-        service_    = 0L;
-    }
-
-    if( proxy_ )
-    {
-        delete proxy_;
-        proxy_      = 0L;
-    }
-
-    if( dbus_ )
-    {
-        delete dbus_;
-        dbus_       = 0L;
     }
 }
 
 bool SkypeWrap::init( IObserver * observer )
 {
-    dummy_log( 0, MODULENAME, "init()" );
+    dummy_log_debug( MODULENAME, "init()" );
 
-    SCOPE_LOCK( mutex_ );
+    MUTEX_SCOPE_LOCK( mutex_ );
 
-    if( is_inited_ )
+    if( is_running_ )
     {
-        dummy_log( 0, MODULENAME, "init: already inited" );
+        dummy_log_error( MODULENAME, "init: already inited" );
         return false;
     }
 
-    try
-    {
-        bool b = init__throwing( observer );
-        if( b )
-        {
-            is_inited_  = true;
-        }
-        return b;
-    }
-    catch( std::exception &e )
-    {
-        set_error_msg( std::string( "exception - " ) + e.what() );
-    }
 
-    return false;
-}
-
-bool SkypeWrap::init__throwing( IObserver * observer )
-{
-    if( dbus_ )
+    dbus::Threads::init_default();
+    dbus::Error error;
+    dbus_ = dbus::Bus::get( DBUS_BUS_SESSION, error );
+    callback_ = observer;
+    if( !dbus_.get_raw() )
     {
-        set_error_msg( "dbus is already initialized" );
+        dummy_log_error( MODULENAME, "%s: %s", error.get_raw().name, error.get_raw().message );
         return false;
     }
 
-    dbus_   = new DBus();
+//  printf("unique name: %s\n", dbus_bus_get_unique_name(dbus_));
+    dbus::Bus::add_match( dbus_, "path='/com/Skype/Client'", error );
+    dbus_.add_filter( signal_filter, this, NULL );
 
-    {
-        bool b = dbus_->init();
+    connect_to_skype();
 
-        if( !b )
-        {
-            set_error_msg( "cannon initialize DBus" );
-            return false;
-        }
-    }
+    must_stop_  = false;
 
-    proxy_  = new DBusProxy();
-
-    {
-        bool b = proxy_->init( dbus_, "com.Skype.API", "/com/Skype" );
-
-        if( !b )
-        {
-            set_error_msg( "cannon initialize DBusProxy" );
-            return false;
-        }
-    }
-
-    service_    = new SkypeServiceC();
-
-    {
-        bool b = service_->init( SKYPE_SERVICE_PATH, observer );
-
-        if( !b )
-        {
-            set_error_msg( "cannon initialize SkypeServiceC" );
-            return false;
-        }
-    }
-
-    {
-        bool b = connect_to_skype();
-        if( !b )
-        {
-            set_error_msg( "cannon connect to Skype" );
-            return false;
-        }
-    }
+    thread_ = std::thread( std::bind( &SkypeWrap::thread_func, this ) );
 
     return true;
 }
 
 bool SkypeWrap::is_inited() const
 {
-    SCOPE_LOCK( mutex_ );
+    MUTEX_SCOPE_LOCK( mutex_ );
 
-    return is_inited_;
+    return is_running_;
 }
 
 bool SkypeWrap::is_inited__() const
 {
-    return is_inited_;
+    return is_running_;
 }
 
-bool SkypeWrap::send( const std::string & s, std::string & response )
+bool SkypeWrap::send( const std::string & s )
 {
-    SCOPE_LOCK( mutex_ );
+    MUTEX_SCOPE_LOCK( mutex_ );
 
     if( !is_inited__() )
     {
@@ -181,7 +112,16 @@ bool SkypeWrap::send( const std::string & s, std::string & response )
         throw std::runtime_error( "SkypeWrap: not initialized" );
     }
 
-    response = send__p( s );
+    return send__( s );
+}
+
+bool SkypeWrap::send__( const std::string & s )
+{
+    const char* command = s.c_str();
+//  std::cout << "Command: " << ss.str() << endl;
+    dbus::Message message( "com.Skype.API", "/com/Skype", "com.Skype.API", "Invoke" );
+    message.append_args( DBUS_TYPE_STRING, &command, DBUS_TYPE_INVALID );
+    dbus_.send( message, NULL );
 
     return true;
 }
@@ -193,80 +133,39 @@ void SkypeWrap::set_error_msg( const std::string & s )
 
 std::string SkypeWrap::get_error_msg() const
 {
-    SCOPE_LOCK( mutex_ );
+    MUTEX_SCOPE_LOCK( mutex_ );
 
     return error_msg_;
 }
 
 bool SkypeWrap::shutdown()
 {
-    dummy_log( 0, MODULENAME, "shutdown()" );
-
-    SCOPE_LOCK( mutex_ );
+    dummy_log_debug( MODULENAME, "shutdown()" );
 
     return shutdown__();
 }
 
 bool SkypeWrap::shutdown__()
 {
-    if( !is_inited_ )
-    {
-        dummy_log( 0, MODULENAME, "shutdown() - not initialized or already down" );
-        return false;
-    }
+    dummy_log_trace( MODULENAME, "shutdown__()" );
 
+    ASSERT( is_running_ );
 
-    if( dbus_ )
-        dbus_->unregister_service( service_ );
+    must_stop_  = true;
 
-    if( service_ )
-        service_->shutdown();
+    thread_.join();
 
-    if( proxy_ )
-        proxy_->shutdown();
-
-    if( dbus_ )
-        dbus_->shutdown();
-
-    is_inited_  = false;
+    dbus_.flush();
 
     return true;
 }
 
-std::string SkypeWrap::send__p( const std::string & command )
-{
-    return proxy_->send( command );
-}
 
 bool SkypeWrap::connect_to_skype()
 {
+    send__( "NAME TestApplication" );
 
-    // Send name
-    std::string ret = send__p( "NAME TestApplication" );
-    // OK or
-    // ERROR 68 = Access denied.
-
-    if( !ret.empty() )
-    {
-        printf( "Got=<%s>\n", ret.c_str() );
-    }
-
-    // Settle protocol
-    ret = send__p( "PROTOCOL 7" ); // Try also "PROTOCOL 2" etc.
-    if( !ret.empty() )
-    {
-        printf( "Got=<%s>\n", ret.c_str() );
-    }
-
-    // Connect notify methods
-    {
-        bool b = dbus_->register_service( service_ );
-        if( !b )
-        {
-            std::cout << "failed to register service" << std::endl;
-            return false;
-        }
-    }
+    send__( "PROTOCOL 5" );
 
     return true;
 }
@@ -288,8 +187,7 @@ void SkypeWrap::control_thread()
         if( input == "exit" || input == "quit" )
             break;
 
-        std::string response;
-        bool b = send( input, response );
+        bool b = send( input );
 
         if( b == false )
         {
@@ -303,27 +201,80 @@ void SkypeWrap::control_thread()
     shutdown();
 }
 
-void SkypeWrap::main_thread()
+void SkypeWrap::thread_func()
 {
-    GdkWrap & g = GdkWrap::get();
+    dummy_log_trace( MODULENAME, "SkypeWrap::thread_func: started" );
 
-    if( !g.is_inited() )
+    is_running_ = true;
+
+    while( true )
     {
-        set_error_msg( "GdkWrap is not initialized" );
-        throw std::runtime_error( "GdkWrap is not initialized" );
+        if( must_stop_ )
+            break;
+
+        {
+            MUTEX_SCOPE_LOCK( mutex_ );
+
+            unsigned int seq = sequence_;
+
+            dbus_.read_write_dispatch( 100 );
+
+            if( seq != sequence_ )
+            {
+                if( sequence_ - seq > 1 )
+                {
+                    dummy_log_fatal( MODULENAME, "SkypeWrap::thread_func: missed messages" );
+                    ::exit( 42 );
+                }
+                callback_->handle( response_ );
+                seq = sequence_;
+            }
+        }
+
+        THIS_THREAD_SLEEP_MS( 1 );
     }
 
-    if( g.is_running() )
-    {
-        set_error_msg( "GdkWrap is already running" );
-        throw std::runtime_error( "GdkWrap is already running" );
-    }
+    is_running_ = false;
 
-    std::cout << "SkypeWrap::main_thread: started" << std::endl;
-
-    g.start();
-
-    std::cout << "SkypeWrap::main_thread: exit" << std::endl;
+    dummy_log_trace( MODULENAME, "SkypeWrap::thread_func: exit" );
 }
+
+DBusHandlerResult SkypeWrap::signal_filter( DBusConnection */*connection*/, DBusMessage *message, void *user_data )
+{
+    SkypeWrap* priv = (SkypeWrap*)user_data;
+    char *s;
+    dbus::Error error;
+    if( dbus::Message( message ).get_args( error, DBUS_TYPE_STRING, &s, DBUS_TYPE_INVALID ) )
+    {
+        std::stringstream ss;
+        ss << "#" << priv->sequence_ << " ";
+        std::string prefix = ss.str();
+
+//      printf("Sequence is %d\n", priv->_sequence);
+//      printf("Prefix is \"%s\"\n", prefix.c_str());
+//      printf("Signal: Response : %s\n", s);
+
+        // Skip sequence number for global message handler;
+        const char* ptr = s;
+        if( s[0] == '#' )
+            ptr = strchr( s, ' ' ) + 1;
+        //priv->message_handler(ptr);
+
+        priv->response_ = ptr;
+        priv->sequence_++;
+
+//      if (strstr(s, prefix.c_str()) == s) {
+//          pthread_mutex_lock(&priv->_lock);
+//          priv->_response = s + prefix.size();
+//          pthread_cond_broadcast(&priv->_cond);
+//          pthread_mutex_unlock(&priv->_lock);
+//      }
+
+        return DBUS_HANDLER_RESULT_HANDLED;
+    }
+    return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+
+}
+
 
 NAMESPACE_SKYPE_WRAP_END

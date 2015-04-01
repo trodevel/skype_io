@@ -57,8 +57,8 @@ endif
 WARN = -W -Wall -Wshadow -Wreturn-type -Wcomment -Wtrigraphs -Wformat -Wparentheses -Wpointer-arith -Wuninitialized -O
 CDBG = -g $(CWARN) -fno-inline
 
-GDK_LIB=$(shell pkg-config --libs gtk+-2.0 gdk-2.0 gthread-2.0 dbus-1 dbus-glib-1)
-GDK_INC=$(shell pkg-config --cflags gtk+-2.0 gdk-2.0 gthread-2.0 dbus-1 dbus-glib-1)
+GDK_LIB=$(shell pkg-config --libs dbus-1)
+GDK_INC=$(shell pkg-config --cflags dbus-1)
 
 ###################################################################
 
@@ -66,7 +66,7 @@ CC=gcc
 
 LDSHARED=gcc
 CPP=gcc -E
-INCL = -I$(BOOST_INC) -I$(GDK_INC) -I.
+INCL = -I$(BOOST_INC) $(GDK_INC) -I.
 
 
 STATICLIB=$(LIBNAME).a
@@ -85,8 +85,10 @@ EXE=
 
 #vpath %.cpp .
 
-SRCC = event.cpp event_proxy.cpp event_parser.cpp gdk_wrap.cpp parser_types.cpp skype-service.c dbus.cpp dbus_proxy.cpp \
-		skype_service_callback.cpp skype_service_c.cpp skype_wrap.cpp skype_io.cpp command_gen.cpp \
+SRCC = \
+		dbus.cpp \
+		event.cpp event_proxy.cpp event_parser.cpp parser_types.cpp \
+		skype_wrap.cpp skype_io.cpp command_gen.cpp \
 		str_helper.cpp
 OBJS = $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRCC)) $(patsubst %.c,$(OBJDIR)/%.o,$(SRCC))
 

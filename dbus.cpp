@@ -19,131 +19,166 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1404 $ $Date:: 2015-01-16 #$ $Author: serge $
+// $Revision: 1685 $ $Date:: 2015-03-31 #$ $Author: serge $
 
 #include "dbus.h"     // self
 
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
 #include <iostream>         // cout
-
-#include "gdk_wrap.h"       // GdkWrap
-
-extern "C" {
-//#include "skype-service.h"
-#include "skype-service-object-glue.h"
-}
 
 #include "../utils/dummy_logger.h"      // dummy_log
 
 #define MODULENAME      "DBus"
 
+using namespace dbus;
 
-NAMESPACE_SKYPE_WRAP_START
+Error::Error()
+{
+    dbus_error_init( & m_ );
+}
 
-#define DBUS_MPRIS_TIMEOUT 300 // Milliseconds
+Error::Error( DBusError e )
+{
+    m_  = e;
+}
 
-DBus::DBus():
-    g_dbus_conn_( 0L )
+Error::~Error()
 {
 }
 
-DBus::~DBus()
-{
-    dummy_log( 0, MODULENAME, "~DBus()" );
+//void Error::init()
+//{
+//    dbus_error_init( & m_ );
+//}
 
-    if( is_inited() )
-        shutdown();
+DBusError & Error::get_raw()
+{
+    return m_;
 }
 
-bool DBus::init_gtk_gdk()
+Connection Bus::get( DBusBusType type, Error &error )
 {
-    GdkWrap & g = GdkWrap::get();
-
-    if( g.is_inited() )
-        return false;
-
-    return g.init();
+    return Connection( dbus_bus_get( type, & error.get_raw() ) );
 }
 
-bool DBus::init()
+void Bus::add_match(
+        Connection  & connection,
+        const char  * rule,
+        Error       & error )
 {
-    dummy_log( 0, MODULENAME, "init()" );
+    dbus_bus_add_match( connection.get_raw(), rule, & error.get_raw() );
+}
 
-    if( g_dbus_conn_ )
+Connection::Connection( DBusConnection  * m ):
+    is_owner_( false ),
+    m_( m )
+{
+}
+
+Connection::~Connection()
+{
+    if( is_owner_ )
     {
-        dummy_log( 0, MODULENAME, "init: already initialized" );
-        return false;
     }
-
-    {
-        bool b = init_gtk_gdk();
-        if( !b )
-        {
-            dummy_log( 0, MODULENAME, "init: Cannot init GTK, GDK" );
-        }
-
-    }
-
-    // Connect to GLib/DBus
-    GError *error = NULL;
-
-
-    g_dbus_conn_ = dbus_g_bus_get( DBUS_BUS_SESSION, &error );
-
-    if( !g_dbus_conn_ )
-    {
-        dummy_log( 0, MODULENAME, "dbus_player_connect_to_dbus: Cannot connect to DBus: %s\n", error ? error->message : "" );
-
-        if( error )
-            g_error_free( error );
-
-        return false ;
-    }
-
-    return true;
 }
 
-bool DBus::is_inited() const
+DBusConnection  *Connection::get_raw()
 {
-    return g_dbus_conn_ != 0L;
+    return m_;
 }
 
-DBusGConnection *DBus::get()
+bool Connection::add_filter(
+        DBusHandleMessageFunction  function,
+        void                      *user_data,
+        DBusFreeFunction           free_data_function )
 {
-    if( !g_dbus_conn_ )
+    return dbus_connection_add_filter( m_, function, user_data, free_data_function );
+}
+
+bool Connection::send(
+        Message               & message,
+        dbus_uint32_t         * client_serial )
+{
+    return dbus_connection_send( m_, message.get(), client_serial );
+}
+
+bool Connection::read_write_dispatch( int timeout_milliseconds )
+{
+    return dbus_connection_read_write_dispatch( m_, timeout_milliseconds );
+}
+
+void Connection::flush()
+{
+    dbus_connection_flush( m_ );
+}
+
+Message::Message(
+    const char  *bus_name,
+    const char  *path,
+    const char  *interface,
+    const char  *method ):
+        is_owner_( true )
+{
+    m_  = dbus_message_new_method_call( bus_name, path, interface, method );
+}
+
+Message::Message( DBusMessage *message ):
+        is_owner_( false ),
+        m_( message )
+{
+}
+
+Message::~Message()
+{
+    if( is_owner_ )
     {
-        throw DBusInitError( "get(): not initialized" );
+        dbus_message_unref( m_ );
+        m_  = nullptr;
     }
-
-    return g_dbus_conn_;
 }
 
-bool DBus::shutdown()
+bool Message::append_args( int first_arg_type, ... )
 {
-    dummy_log( 0, MODULENAME, "shutdown()" );
+    va_list var_args;
 
-    if( !g_dbus_conn_ )
-    {
-        dummy_log( 0, MODULENAME, "shutdown() - already down" );
-        return false;
-    }
+    va_start( var_args, first_arg_type );
 
-    dbus_g_connection_unref( g_dbus_conn_ );
+    bool res = append_args_valist( first_arg_type, var_args );
 
-    g_dbus_conn_    = 0L;
+    va_end( var_args );
 
-    GdkWrap & g = GdkWrap::get();
-
-    if( g.is_inited() )
-        g.shutdown();
-
-    return true;
+    return res;
 }
 
-const DBusGObjectInfo* DBus::get_object_info()
+bool Message::append_args_valist( int first_arg_type, va_list var_args )
 {
-    return &dbus_glib_server_object_object_info;
+    return dbus_message_append_args_valist( m_, first_arg_type, var_args );
 }
 
-NAMESPACE_SKYPE_WRAP_END
+bool Message::get_args( Error &error, int first_arg_type, ... )
+{
+    va_list var_args;
+
+    va_start( var_args, first_arg_type );
+
+    bool res = get_args_args_valist( error, first_arg_type, var_args );
+
+    va_end( var_args );
+
+    return res;
+}
+
+bool Message::get_args_args_valist( Error &error, int first_arg_type, va_list var_args )
+{
+    return dbus_message_get_args_valist( m_, & error.get_raw(), first_arg_type, var_args );
+}
+
+DBusMessage *Message::get()
+{
+    return m_;
+}
+
+void Threads::init_default()
+{
+    dbus_threads_init_default();
+}
+

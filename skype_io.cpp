@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1404 $ $Date:: 2015-01-16 #$ $Author: serge $
+// $Revision: 1673 $ $Date:: 2015-03-31 #$ $Author: serge $
 
 #include "skype_io.h"       // self
 
@@ -41,8 +41,6 @@ SkypeIo::~SkypeIo()
     dummy_log( 0, MODULENAME, "~SkypeIo()" );
 
     SCOPE_LOCK( mutex_ );
-
-    sw_.shutdown();
 }
 
 bool SkypeIo::init()
@@ -74,11 +72,11 @@ bool SkypeIo::is_inited() const
     return sw_.is_inited();
 }
 
-bool SkypeIo::send_raw( const std::string & s, std::string & response )
+bool SkypeIo::send_raw( const std::string & s )
 {
     SCOPE_LOCK( mutex_ );
 
-    return sw_.send( s, response );
+    return sw_.send( s );
 }
 
 std::string SkypeIo::get_error_msg() const
@@ -109,11 +107,6 @@ void SkypeIo::control_thread()
     sw_.control_thread();
 }
 
-void SkypeIo::main_thread()
-{
-    sw_.main_thread();
-}
-
 // Skype interface
 bool SkypeIo::call( const std::string & s )
 {
@@ -121,7 +114,7 @@ bool SkypeIo::call( const std::string & s )
 
     SCOPE_LOCK( mutex_ );
 
-    return sw_.send( cmd, response_ );
+    return sw_.send( cmd );
 }
 bool SkypeIo::get_call_property( uint32 id, const std::string & s )
 {
@@ -129,7 +122,7 @@ bool SkypeIo::get_call_property( uint32 id, const std::string & s )
 
     SCOPE_LOCK( mutex_ );
 
-    return sw_.send( cmd, response_ );
+    return sw_.send( cmd );
 }
 bool SkypeIo::set_call_status( uint32 id, call_status_e s )
 {
@@ -137,7 +130,7 @@ bool SkypeIo::set_call_status( uint32 id, call_status_e s )
 
     SCOPE_LOCK( mutex_ );
 
-    return sw_.send( cmd, response_ );
+    return sw_.send( cmd );
 }
 bool SkypeIo::alter_call_hangup( uint32 id )
 {
@@ -145,7 +138,7 @@ bool SkypeIo::alter_call_hangup( uint32 id )
 
     SCOPE_LOCK( mutex_ );
 
-    return sw_.send( cmd, response_ );
+    return sw_.send( cmd );
 }
 bool SkypeIo::alter_call_set_input_soundcard( uint32 id )
 {
@@ -153,7 +146,7 @@ bool SkypeIo::alter_call_set_input_soundcard( uint32 id )
 
     SCOPE_LOCK( mutex_ );
 
-    return sw_.send( cmd, response_ );
+    return sw_.send( cmd );
 }
 bool SkypeIo::alter_call_set_input_port( uint32 id, uint32 p )
 {
@@ -161,7 +154,7 @@ bool SkypeIo::alter_call_set_input_port( uint32 id, uint32 p )
 
     SCOPE_LOCK( mutex_ );
 
-    return sw_.send( cmd, response_ );
+    return sw_.send( cmd );
 }
 bool SkypeIo::alter_call_set_input_file( uint32 id, const std::string & s )
 {
@@ -169,7 +162,7 @@ bool SkypeIo::alter_call_set_input_file( uint32 id, const std::string & s )
 
     SCOPE_LOCK( mutex_ );
 
-    return sw_.send( cmd, response_ );
+    return sw_.send( cmd );
 }
 bool SkypeIo::alter_call_set_output_soundcard( uint32 id )
 {
@@ -177,7 +170,7 @@ bool SkypeIo::alter_call_set_output_soundcard( uint32 id )
 
     SCOPE_LOCK( mutex_ );
 
-    return sw_.send( cmd, response_ );
+    return sw_.send( cmd );
 }
 bool SkypeIo::alter_call_set_output_port( uint32 id, uint32 p )
 {
@@ -185,7 +178,7 @@ bool SkypeIo::alter_call_set_output_port( uint32 id, uint32 p )
 
     SCOPE_LOCK( mutex_ );
 
-    return sw_.send( cmd, response_ );
+    return sw_.send( cmd );
 }
 bool SkypeIo::alter_call_set_output_file( uint32 id, const std::string & s )
 {
@@ -193,7 +186,7 @@ bool SkypeIo::alter_call_set_output_file( uint32 id, const std::string & s )
 
     SCOPE_LOCK( mutex_ );
 
-    return sw_.send( cmd, response_ );
+    return sw_.send( cmd );
 }
 bool SkypeIo::alter_call_set_capture_mic_port( uint32 id, uint32 p )
 {
@@ -201,7 +194,7 @@ bool SkypeIo::alter_call_set_capture_mic_port( uint32 id, uint32 p )
 
     SCOPE_LOCK( mutex_ );
 
-    return sw_.send( cmd, response_ );
+    return sw_.send( cmd );
 }
 bool SkypeIo::alter_call_set_capture_mic_file( uint32 id, const std::string & s )
 {
@@ -209,15 +202,7 @@ bool SkypeIo::alter_call_set_capture_mic_file( uint32 id, const std::string & s 
 
     SCOPE_LOCK( mutex_ );
 
-    return sw_.send( cmd, response_ );
-}
-
-// should be called after each Skype command
-std::string SkypeIo::get_response() const
-{
-    SCOPE_LOCK( mutex_ );
-
-    return response_;
+    return sw_.send( cmd );
 }
 
 

@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1404 $ $Date:: 2015-01-16 #$ $Author: serge $
+// $Revision: 1673 $ $Date:: 2015-03-31 #$ $Author: serge $
 
 #ifndef SKYPE_IO_H
 #define SKYPE_IO_H
@@ -53,7 +53,7 @@ public:
 
     bool register_callback( ISkypeCallback * eh );
 
-    bool send_raw( const std::string & s, std::string & response );
+    bool send_raw( const std::string & s );
 
     // Skype interface
     bool call( const std::string & s );
@@ -69,14 +69,9 @@ public:
     bool alter_call_set_capture_mic_port( uint32 id, uint32 p );
     bool alter_call_set_capture_mic_file( uint32 id, const std::string & s );
 
-    // should be called after each Skype command
-    std::string get_response() const;
-
     void control_thread();
-    void main_thread();
 
     std::string get_error_msg() const;
-
 
 private:
 
@@ -87,8 +82,6 @@ private:
     SkypeWrap               sw_;
 
     EventProxy              event_proxy_;
-
-    std::string             response_;
 };
 
 NAMESPACE_SKYPE_WRAP_END

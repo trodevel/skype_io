@@ -19,13 +19,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1404 $ $Date:: 2015-01-16 #$ $Author: serge $
+// $Revision: 1679 $ $Date:: 2015-03-31 #$ $Author: serge $
 
 #ifndef SKYPE_WRAP_H
 #define SKYPE_WRAP_H
 
 #include <string>                   // std::string
-#include <boost/thread.hpp>         // boost::mutex
+#include <mutex>                    // std::mutex
+#include <thread>                   // std::thread
+#include <atomic>                   // std::atomic
+
+#include <dbus/dbus.h>              // DBusConnection
+#include "dbus.h"                   // dbus::Connection
 
 #include "namespace_lib.h"          // NAMESPACE_SKYPE_WRAP_START
 #include "i_observer.h"             // IObserver
@@ -44,13 +49,14 @@ public:
     ~SkypeWrap();
 
     bool init( IObserver * observer );
+
+    bool start();
     bool shutdown();
 
     bool is_inited() const;
 
-    bool send( const std::string & s, std::string & response );
+    bool send( const std::string & s );
 
-    void main_thread();
     void control_thread();
 
     std::string get_error_msg() const;
@@ -58,28 +64,38 @@ public:
 
 private:
 
+    //static void* thread_func_wrap( void* arg );
+
+    void thread_func();
+
+    static DBusHandlerResult signal_filter( DBusConnection *connection, DBusMessage *message, void *user_data );
+
+    bool send__( const std::string & s );
+
     bool shutdown__();
 
     bool is_inited__() const;
 
     void set_error_msg( const std::string & s );
 
-    bool init__throwing( IObserver * observer );
-
-    std::string send__p( const std::string & command );
-
     bool connect_to_skype();
 
 private:
-    mutable boost::mutex    mutex_;
+    mutable std::mutex    mutex_;
 
-    DBus            * dbus_;
+    std::thread         thread_;
 
-    DBusProxy       * proxy_;
+    std::atomic<bool>   must_stop_;
 
-    SkypeServiceC   * service_;
+    dbus::Connection    dbus_;
 
-    bool            is_inited_;
+    IObserver       * callback_;
+
+    unsigned int    sequence_;
+
+    bool            is_running_;
+
+    std::string     response_;
 
     std::string     error_msg_;
 };

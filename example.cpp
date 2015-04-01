@@ -19,13 +19,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1404 $ $Date:: 2015-01-16 #$ $Author: serge $
+// $Revision: 1688 $ $Date:: 2015-03-31 #$ $Author: serge $
 
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include <iostream>         // cout
 
-#include "skype_io.h"               // SkypeIo
+#include "../utils/dummy_logger.h"      // dummy_log_set_log_level
+#include "skype_io.h"       // SkypeIo
+#include "event.h"          // Event
 
 class SkypeCallback: virtual public skype_wrap::ISkypeCallback
 {
@@ -37,12 +39,17 @@ public:
     // callback interface
     virtual void consume( const skype_wrap::Event * e )
     {
+        std::cout << "got event " << e->get_type() << std::endl;
+
+        delete e;
     }
 };
 
 
 int main( int argc, char **argv )
 {
+    dummy_logger::set_log_level( log_levels_log4j::TRACE );
+
     skype_wrap::SkypeIo sio;
 
     bool b = sio.init();
@@ -60,7 +67,6 @@ int main( int argc, char **argv )
     boost::thread_group Tg;
 
     Tg.create_thread( boost::bind( &skype_wrap::SkypeIo::control_thread, &sio ) );
-    Tg.create_thread( boost::bind( &skype_wrap::SkypeIo::main_thread, &sio ) );
 
     Tg.join_all();
 

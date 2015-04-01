@@ -19,112 +19,115 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1404 $ $Date:: 2015-01-16 #$ $Author: serge $
+// $Revision: 1684 $ $Date:: 2015-03-31 #$ $Author: serge $
 
-#ifndef SKYPE_DBUS_H
-#define SKYPE_DBUS_H
+#ifndef DBUS_CPP_DBUS_H
+#define DBUS_CPP_DBUS_H
 
-#include <glib.h>
-#include <gtk/gtk.h>
-#include <gdk/gdk.h>
 #include <dbus/dbus.h>
-#include <dbus/dbus-glib.h>
 
-#include <string>                   // std::string
-#include <stdexcept>                // std::runtime_error
-#include <boost/thread.hpp>         // boost::mutex
+#include <string>           // std::string
+#include <stdarg.h>         // va_list stuff
 
-#include "namespace_lib.h"          // NAMESPACE_SKYPE_WRAP_START
-
-extern "C" {
-#include "skype-service.h"
-}
-
-NAMESPACE_SKYPE_WRAP_START
-
-class DBus
+namespace dbus
 {
 
+class Connection;
+class Message;
+
+class Error
+{
 public:
-    DBus();
-    ~DBus();
 
-    bool init();
-    bool shutdown();
+    Error();
+    Error( DBusError e );
+    ~Error();
 
-    bool is_inited() const;
+//    void init();
 
-    //DBusGConnection *dbus_player_connect_to_dbus();
-    DBusGConnection *get();
+    DBusError & get_raw();
 
-    template<typename _T>
-    bool register_service( _T * service_object )
-    {
-        // Create a receiver object
-        if( !service_object )
-        {
-            return false;
-            // Same as: g_object_new(TYPE_SKYPE_SERVICE, NULL);
-        }
+private:
+    DBusError m_;
+};
 
-        // Connect to DBus
-        DBusGConnection *dbus_conn = get();
+class Bus
+{
+public:
 
+    static Connection get( DBusBusType type, Error &error );
 
-        const char * service_path_s = service_object->get_service_path().c_str();
+    static void add_match(
+            Connection  & connection,
+            const char  * rule,
+            Error       & error );
+};
 
-        dbus_g_object_type_install_info( G_TYPE_FROM_INSTANCE( service_object->get() ), get_object_info() );
-        dbus_g_connection_register_g_object( dbus_conn, service_path_s/*/com/Skype/Client*/, (GObject*)service_object->get() );
+class Connection
+{
+public:
 
-        g_print( "Setup of service object and notify calls done and OK.\n" );
+    Connection( DBusConnection  * m );
+    ~Connection();
 
-        return true;
-    }
+    DBusConnection  *get_raw();
 
-    template<typename _T>
-    bool unregister_service( _T * service_object )
-    {
-        // Create a receiver object
-        if( !service_object )
-        {
-            return false;
-            // Same as: g_object_new(TYPE_SKYPE_SERVICE, NULL);
-        }
+    bool add_filter(
+            DBusHandleMessageFunction  function,
+            void                      *user_data,
+            DBusFreeFunction           free_data_function );
 
-        g_object_unref( service_object->get() );
+    bool send(
+            Message               & message,
+            dbus_uint32_t         * client_serial );
 
-        return true;
-    }
+    bool read_write_dispatch( int timeout_milliseconds );
+
+    void flush();
 
 private:
 
-    bool init_gtk_gdk();
+    bool            is_owner_;
 
-    static const DBusGObjectInfo* get_object_info();
+    DBusConnection  * m_;
+};
 
+class Message
+{
+public:
+
+    Message(
+        const char  *bus_name,
+        const char  *path,
+        const char  *interface,
+        const char  *method );
+
+    Message( DBusMessage *message );
+
+    ~Message();
+
+     bool append_args( int first_arg_type, ... );
+     bool append_args_valist( int first_arg_type, va_list var_args );
+
+     bool get_args( Error &error, int first_arg_type, ... );
+     bool get_args_args_valist( Error &error, int first_arg_type, va_list var_args );
+
+     DBusMessage *get();
 
 private:
-    DBusGConnection     * g_dbus_conn_;
+
+     bool           is_owner_;
+
+     DBusMessage    * m_;
+
 };
 
-class DBusSendError: public std::runtime_error
+class Threads
 {
 public:
-    DBusSendError( const std::string& s ) :
-        std::runtime_error( "DbSe-" + s )
-    {
-    }
+    static void init_default();
 };
 
-class DBusInitError: public std::runtime_error
-{
-public:
-    DBusInitError( const std::string& s ) :
-        std::runtime_error( "DbIe-" + s )
-    {
-    }
-};
+} // namespace dbus
 
-NAMESPACE_SKYPE_WRAP_END
-
-#endif  // SKYPE_DBUS_H
+#endif  // DBUS_CPP_DBUS_H
