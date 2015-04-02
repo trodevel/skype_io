@@ -19,18 +19,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1665 $ $Date:: 2015-03-31 #$ $Author: serge $
+// $Revision: 1691 $ $Date:: 2015-04-01 #$ $Author: serge $
 
-#include "event_proxy.h"        // self
+#include "event_gen.h"              // self
 
-#include "event_parser.h"       // EventParser
+#include "event_parser.h"           // EventParser
 
 #include "../utils/wrap_mutex.h"    // SCOPE_LOCK
 #include "../utils/assert.h"        // ASSERT
 
 NAMESPACE_SKYPE_WRAP_START
 
-EventProxy::EventProxy():
+EventGen::EventGen():
     callback_( nullptr )
 {
 }
@@ -38,7 +38,7 @@ EventProxy::EventProxy():
 /**
  * @return true - success, false - error
  */
-bool EventProxy::register_callback( ISkypeCallback * callback )
+bool EventGen::register_callback( ISkypeCallback * callback )
 {
     if( callback == nullptr )
         return false;
@@ -52,9 +52,9 @@ bool EventProxy::register_callback( ISkypeCallback * callback )
     return true;
 }
 
-void EventProxy::handle( const std::string & s )
+void EventGen::handle( const std::string & s )
 {
-    std::cout << "EventProxy::handle: " << s << std::endl;
+    std::cout << "EventGen::handle: " << s << std::endl;
 
     Event *ev = EventParser::to_event( s );
 

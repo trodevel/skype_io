@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1679 $ $Date:: 2015-03-31 #$ $Author: serge $
+// $Revision: 1695 $ $Date:: 2015-04-01 #$ $Author: serge $
 
 #ifndef SKYPE_WRAP_H
 #define SKYPE_WRAP_H
@@ -29,17 +29,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <thread>                   // std::thread
 #include <atomic>                   // std::atomic
 
-#include <dbus/dbus.h>              // DBusConnection
-#include "dbus.h"                   // dbus::Connection
-
 #include "namespace_lib.h"          // NAMESPACE_SKYPE_WRAP_START
 #include "i_observer.h"             // IObserver
 
 NAMESPACE_SKYPE_WRAP_START
 
-class DBus;
-class DBusProxy;
-class SkypeServiceC;
+class SkypeWrapImpl;
 
 class SkypeWrap
 {
@@ -50,7 +45,6 @@ public:
 
     bool init( IObserver * observer );
 
-    bool start();
     bool shutdown();
 
     bool is_inited() const;
@@ -61,43 +55,9 @@ public:
 
     std::string get_error_msg() const;
 
-
 private:
 
-    //static void* thread_func_wrap( void* arg );
-
-    void thread_func();
-
-    static DBusHandlerResult signal_filter( DBusConnection *connection, DBusMessage *message, void *user_data );
-
-    bool send__( const std::string & s );
-
-    bool shutdown__();
-
-    bool is_inited__() const;
-
-    void set_error_msg( const std::string & s );
-
-    bool connect_to_skype();
-
-private:
-    mutable std::mutex    mutex_;
-
-    std::thread         thread_;
-
-    std::atomic<bool>   must_stop_;
-
-    dbus::Connection    dbus_;
-
-    IObserver       * callback_;
-
-    unsigned int    sequence_;
-
-    bool            is_running_;
-
-    std::string     response_;
-
-    std::string     error_msg_;
+    SkypeWrapImpl       & impl_;
 };
 
 NAMESPACE_SKYPE_WRAP_END

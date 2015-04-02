@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1683 $ $Date:: 2015-03-31 #$ $Author: serge $
+// $Revision: 1695 $ $Date:: 2015-04-01 #$ $Author: serge $
 
 #include "skype_wrap.h"     // self
 
@@ -27,6 +27,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <cstring>              // strchr
 #include <iostream>             // cout
 #include <functional>           // std::bind
+
+#include "dbus.h"                   // dbus::Connection
 
 #include "../utils/mutex_helper.h"  // MUTEX_SCOPE_LOCK
 #include "../utils/dummy_logger.h"  // dummy_log
@@ -37,14 +39,72 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 NAMESPACE_SKYPE_WRAP_START
 
-SkypeWrap::SkypeWrap():
+class SkypeWrapImpl
+{
+
+public:
+    SkypeWrapImpl();
+    ~SkypeWrapImpl();
+
+    bool init( IObserver * observer );
+
+    bool shutdown();
+
+    bool is_inited() const;
+
+    bool send( const std::string & s );
+
+    void control_thread();
+
+    std::string get_error_msg() const;
+
+
+private:
+
+    //static void* thread_func_wrap( void* arg );
+
+    void thread_func();
+
+    static DBusHandlerResult signal_filter( DBusConnection *connection, DBusMessage *message, void *user_data );
+
+    bool send__( const std::string & s );
+
+    bool shutdown__();
+
+    bool is_inited__() const;
+
+    void set_error_msg( const std::string & s );
+
+    bool connect_to_skype();
+
+private:
+    mutable std::mutex    mutex_;
+
+    std::thread         thread_;
+
+    std::atomic<bool>   must_stop_;
+
+    dbus::Connection    dbus_;
+
+    IObserver           * callback_;
+
+    unsigned int    sequence_;
+
+    bool            is_running_;
+
+    std::string     response_;
+
+    std::string     error_msg_;
+};
+
+SkypeWrapImpl::SkypeWrapImpl():
     must_stop_( true ), dbus_( nullptr ), callback_( nullptr ), sequence_( 0 ), is_running_( false )
 {
 }
 
-SkypeWrap::~SkypeWrap()
+SkypeWrapImpl::~SkypeWrapImpl()
 {
-    dummy_log_debug( MODULENAME, "~SkypeWrap()" );
+    dummy_log_debug( MODULENAME, "~SkypeWrapImpl()" );
 
     MUTEX_SCOPE_LOCK( mutex_ );
 
@@ -54,7 +114,7 @@ SkypeWrap::~SkypeWrap()
     }
 }
 
-bool SkypeWrap::init( IObserver * observer )
+bool SkypeWrapImpl::init( IObserver * observer )
 {
     dummy_log_debug( MODULENAME, "init()" );
 
@@ -85,67 +145,65 @@ bool SkypeWrap::init( IObserver * observer )
 
     must_stop_  = false;
 
-    thread_ = std::thread( std::bind( &SkypeWrap::thread_func, this ) );
+    thread_ = std::thread( std::bind( &SkypeWrapImpl::thread_func, this ) );
 
     return true;
 }
 
-bool SkypeWrap::is_inited() const
+bool SkypeWrapImpl::is_inited() const
 {
     MUTEX_SCOPE_LOCK( mutex_ );
 
     return is_running_;
 }
 
-bool SkypeWrap::is_inited__() const
+bool SkypeWrapImpl::is_inited__() const
 {
     return is_running_;
 }
 
-bool SkypeWrap::send( const std::string & s )
+bool SkypeWrapImpl::send( const std::string & s )
 {
     MUTEX_SCOPE_LOCK( mutex_ );
 
     if( !is_inited__() )
     {
-        set_error_msg( "SkypeWrap: not initialized" );
-        throw std::runtime_error( "SkypeWrap: not initialized" );
+        set_error_msg( "SkypeWrapImpl: not initialized" );
+        throw std::runtime_error( "SkypeWrapImpl: not initialized" );
     }
 
     return send__( s );
 }
 
-bool SkypeWrap::send__( const std::string & s )
+bool SkypeWrapImpl::send__( const std::string & s )
 {
     const char* command = s.c_str();
 //  std::cout << "Command: " << ss.str() << endl;
     dbus::Message message( "com.Skype.API", "/com/Skype", "com.Skype.API", "Invoke" );
     message.append_args( DBUS_TYPE_STRING, &command, DBUS_TYPE_INVALID );
-    dbus_.send( message, NULL );
-
-    return true;
+    return dbus_.send( message, NULL );
 }
 
-void SkypeWrap::set_error_msg( const std::string & s )
+void SkypeWrapImpl::set_error_msg( const std::string & s )
 {
     error_msg_  = s;
 }
 
-std::string SkypeWrap::get_error_msg() const
+std::string SkypeWrapImpl::get_error_msg() const
 {
     MUTEX_SCOPE_LOCK( mutex_ );
 
     return error_msg_;
 }
 
-bool SkypeWrap::shutdown()
+bool SkypeWrapImpl::shutdown()
 {
     dummy_log_debug( MODULENAME, "shutdown()" );
 
     return shutdown__();
 }
 
-bool SkypeWrap::shutdown__()
+bool SkypeWrapImpl::shutdown__()
 {
     dummy_log_trace( MODULENAME, "shutdown__()" );
 
@@ -161,7 +219,7 @@ bool SkypeWrap::shutdown__()
 }
 
 
-bool SkypeWrap::connect_to_skype()
+bool SkypeWrapImpl::connect_to_skype()
 {
     send__( "NAME TestApplication" );
 
@@ -170,7 +228,7 @@ bool SkypeWrap::connect_to_skype()
     return true;
 }
 
-void SkypeWrap::control_thread()
+void SkypeWrapImpl::control_thread()
 {
     std::cout << "type exit or quit to quit: " << std::endl;
 
@@ -201,9 +259,9 @@ void SkypeWrap::control_thread()
     shutdown();
 }
 
-void SkypeWrap::thread_func()
+void SkypeWrapImpl::thread_func()
 {
-    dummy_log_trace( MODULENAME, "SkypeWrap::thread_func: started" );
+    dummy_log_trace( MODULENAME, "SkypeWrapImpl::thread_func: started" );
 
     is_running_ = true;
 
@@ -223,7 +281,7 @@ void SkypeWrap::thread_func()
             {
                 if( sequence_ - seq > 1 )
                 {
-                    dummy_log_fatal( MODULENAME, "SkypeWrap::thread_func: missed messages" );
+                    dummy_log_fatal( MODULENAME, "SkypeWrapImpl::thread_func: missed messages" );
                     ::exit( 42 );
                 }
                 callback_->handle( response_ );
@@ -236,12 +294,12 @@ void SkypeWrap::thread_func()
 
     is_running_ = false;
 
-    dummy_log_trace( MODULENAME, "SkypeWrap::thread_func: exit" );
+    dummy_log_trace( MODULENAME, "SkypeWrapImpl::thread_func: exit" );
 }
 
-DBusHandlerResult SkypeWrap::signal_filter( DBusConnection */*connection*/, DBusMessage *message, void *user_data )
+DBusHandlerResult SkypeWrapImpl::signal_filter( DBusConnection */*connection*/, DBusMessage *message, void *user_data )
 {
-    SkypeWrap* priv = (SkypeWrap*)user_data;
+    SkypeWrapImpl* priv = (SkypeWrapImpl*)user_data;
     char *s;
     dbus::Error error;
     if( dbus::Message( message ).get_args( error, DBUS_TYPE_STRING, &s, DBUS_TYPE_INVALID ) )
@@ -276,5 +334,45 @@ DBusHandlerResult SkypeWrap::signal_filter( DBusConnection */*connection*/, DBus
 
 }
 
+
+SkypeWrap::SkypeWrap():
+        impl_( * new SkypeWrapImpl )
+{
+}
+
+SkypeWrap::~SkypeWrap()
+{
+    delete & impl_;
+}
+
+bool SkypeWrap::init( IObserver * observer )
+{
+    return impl_.init( observer );
+}
+
+bool SkypeWrap::shutdown()
+{
+    return impl_.shutdown();
+}
+
+bool SkypeWrap::is_inited() const
+{
+    return impl_.is_inited();
+}
+
+bool SkypeWrap::send( const std::string & s )
+{
+    return impl_.send( s );
+}
+
+void SkypeWrap::control_thread()
+{
+    impl_.control_thread();
+}
+
+std::string SkypeWrap::get_error_msg() const
+{
+    return impl_.get_error_msg();
+}
 
 NAMESPACE_SKYPE_WRAP_END

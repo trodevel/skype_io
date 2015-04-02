@@ -19,10 +19,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1404 $ $Date:: 2015-01-16 #$ $Author: serge $
+// $Revision: 1691 $ $Date:: 2015-04-01 #$ $Author: serge $
 
-#ifndef EVENT_PROXY_H
-#define EVENT_PROXY_H
+#ifndef EVENT_GEN_H
+#define EVENT_GEN_H
 
 #include <boost/thread.hpp>         // boost::mutex
 
@@ -31,10 +31,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 NAMESPACE_SKYPE_WRAP_START
 
-class EventProxy: public IObserver
+class EventGen: public IObserver
 {
 public:
-    EventProxy();
+    EventGen();
 
     virtual void handle( const std::string & s );
 
@@ -48,4 +48,4 @@ private:
 
 NAMESPACE_SKYPE_WRAP_END
 
-#endif  // EVENT_PROXY_H
+#endif  // EVENT_GEN_H

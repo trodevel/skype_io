@@ -19,20 +19,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1673 $ $Date:: 2015-03-31 #$ $Author: serge $
+// $Revision: 1693 $ $Date:: 2015-04-01 #$ $Author: serge $
 
 #ifndef SKYPE_IO_H
 #define SKYPE_IO_H
 
 #include <string>                   // std::string
-#include <boost/thread.hpp>         // boost::mutex
+#include <mutex>                    // std::mutex
 
 #include "../threcon/i_controllable.h"      // IControllable
 #include "../utils/types.h"         // uint32
 
 #include "namespace_lib.h"          // NAMESPACE_SKYPE_WRAP_START
 #include "skype_wrap.h"             // SkypeWrap
-#include "event_proxy.h"            // EventProxy
+#include "event_gen.h"              // EventGen
 #include "parser_types.h"           // call_status_e
 
 NAMESPACE_SKYPE_WRAP_START
@@ -77,11 +77,11 @@ private:
 
 private:
 
-    mutable boost::mutex    mutex_;
+    mutable std::mutex      mutex_;
 
     SkypeWrap               sw_;
 
-    EventProxy              event_proxy_;
+    EventGen                event_gen_;
 };
 
 NAMESPACE_SKYPE_WRAP_END

@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1404 $ $Date:: 2015-01-16 #$ $Author: serge $
+// $Revision: 1692 $ $Date:: 2015-04-01 #$ $Author: serge $
 
 #ifndef EVENT_H
 #define EVENT_H
@@ -59,6 +59,8 @@ public:
 public:
     Event(
         Event::type_e       type );
+
+    virtual ~Event() {}
 
     type_e get_type() const;
 
