@@ -1,0 +1,12 @@
+
+* required libraries
+
+3rd party:
+
+- dbus
+
+sudo apt-get install dbus libdbus-1-dev
+
+own:
+
+- threcon (optionally)
