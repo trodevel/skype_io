@@ -1,0 +1,28 @@
+
+* Ubuntu Server 14.04
+
+-- install Vistual display and x11 VNC server
+
+sudo apt-get install xvfb x11vnc screen
+sudo apt-get install libgtk2.0-0:i386
+
+-- install Skype
+
+sudo add-apt-repository "deb http://archive.canonical.com/ $(lsb_release -sc) partner"
+sudo apt-get update
+sudo apt-get install skype
+
+-- launch Skype
+
+screen -S Skype xvfb-run -n 0 -s "-screen 0 800x600x16" /usr/bin/skype
+
+-- launch x11 VNC server
+
+ps wwwwaux | grep auth
+x11vnc -display :0 -auth ...
+
+-- in Virtualbox
+
+make port forwaring: 5900 to 5900
+
+Settings -> Network -> Adapter 1 -> Port Forwarding
