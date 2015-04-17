@@ -19,10 +19,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1688 $ $Date:: 2015-03-31 #$ $Author: serge $
+// $Revision: 1703 $ $Date:: 2015-04-14 #$ $Author: serge $
 
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
+#include <thread>           // std::thread
+#include <functional>       // std::bind
 #include <iostream>         // cout
 
 #include "../utils/dummy_logger.h"      // dummy_log_set_log_level
@@ -64,11 +64,9 @@ int main( int argc, char **argv )
 
     sio.register_callback( &test );
 
-    boost::thread_group Tg;
+    std::thread t( std::bind( &skype_wrap::SkypeIo::control_thread, &sio ) );
 
-    Tg.create_thread( boost::bind( &skype_wrap::SkypeIo::control_thread, &sio ) );
-
-    Tg.join_all();
+    t.join();
 
     std::cout << "Done! =)" << std::endl;
 

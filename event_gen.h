@@ -19,12 +19,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1691 $ $Date:: 2015-04-01 #$ $Author: serge $
+// $Revision: 1703 $ $Date:: 2015-04-14 #$ $Author: serge $
 
 #ifndef EVENT_GEN_H
 #define EVENT_GEN_H
 
-#include <boost/thread.hpp>         // boost::mutex
+#include <mutex>                    // std::mutex
 
 #include "i_observer.h"             // IObserver
 #include "i_skype_callback.h"       // ISkypeCallback
@@ -41,7 +41,7 @@ public:
     bool register_callback( ISkypeCallback * callback );
 
 private:
-    mutable boost::mutex        mutex_;
+    mutable std::mutex          mutex_;
 
     ISkypeCallback              * callback_;
 };

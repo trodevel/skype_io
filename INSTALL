@@ -4,9 +4,11 @@
 3rd party:
 
 - dbus
+- boost 1.53 (for assertion)
 
-sudo apt-get install dbus libdbus-1-dev
+sudo apt-get install dbus libdbus-1-dev 
 
 own:
 
+- utils (logger)
 - threcon (optionally)

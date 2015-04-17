@@ -17,12 +17,17 @@ endif
 
 ###################################################################
 
-BOOST_LIB_SYSTEM := libboost_system.a
-BOOST_LIB_THREAD := libboost_thread.a
-
-
 BOOST_INC=$(BOOST_PATH)
-BOOST_LIB=$(BOOST_PATH)/stage/lib
+BOOST_LIB_PATH=$(BOOST_PATH)/stage/lib
+
+BOOST_LIB_NAMES := system
+BOOST_LIBS = $(patsubst %,$(BOOST_LIB_PATH)/libboost_%.a,$(BOOST_LIB_NAMES))
+
+###################################################################
+
+GDK_LIB=$(shell pkg-config --libs dbus-1)
+GDK_INC=$(shell pkg-config --cflags dbus-1)
+EXT_LIBS=$(GDK_LIB) $(BOOST_LIBS)
 
 ###################################################################
 
@@ -37,7 +42,7 @@ ifeq "$(MODE)" "debug"
     CFLAGS := -Wall -std=c++0x -ggdb -g3
     LFLAGS := -Wall -lstdc++ -lrt -ldl -lm -g
 #    LFLAGS_TEST := -Wall -lstdc++ -lrt -ldl -g -L. $(BINDIR)/$(LIBNAME).a $(BINDIR)/libutils.a -lm
-    LFLAGS_TEST := -Wall -lstdc++ -lrt -ldl -g -L. $(BINDIR)/$(LIBNAME).a -lm
+    LFLAGS_TEST := -Wall -lstdc++ -lrt -ldl -g -L. -lm
 
     TARGET=example
 else
@@ -47,18 +52,10 @@ else
     CFLAGS := -Wall -std=c++0x
     LFLAGS := -Wall -lstdc++ -lrt -ldl -lm
 #    LFLAGS_TEST := -Wall -lstdc++ -lrt -ldl -L. $(BINDIR)/$(LIBNAME).a $(BINDIR)/libutils.a -lm
-    LFLAGS_TEST := -Wall -lstdc++ -lrt -ldl -L. $(BINDIR)/$(LIBNAME).a -lm
+    LFLAGS_TEST := -Wall -lstdc++ -lrt -ldl -L. -lm
 
     TARGET=example
 endif
-
-###################################################################
-
-WARN = -W -Wall -Wshadow -Wreturn-type -Wcomment -Wtrigraphs -Wformat -Wparentheses -Wpointer-arith -Wuninitialized -O
-CDBG = -g $(CWARN) -fno-inline
-
-GDK_LIB=$(shell pkg-config --libs dbus-1)
-GDK_INC=$(shell pkg-config --cflags dbus-1)
 
 ###################################################################
 
@@ -123,9 +120,7 @@ $(TARGET): $(BINDIR) $(BINDIR)/$(TARGET)
 	@echo "$@ uptodate - ${MODE}"
 
 $(BINDIR)/$(TARGET): $(LIBS) $(OBJDIR)/$(TARGET).o $(OBJS) $(BINDIR)/$(STATICLIB)
-	$(CC) $(CFLAGS) $(CDBG) -o $@ $(OBJDIR)/$(TARGET).o $(LFLAGS_TEST) $(LIBS) $(BOOST_LIB)/$(BOOST_LIB_THREAD) $(BOOST_LIB)/$(BOOST_LIB_SYSTEM) \
-		$(GDK_LIB)
-	
+	$(CC) $(CFLAGS) $(CDBG) -o $@ $(OBJDIR)/$(TARGET).o $(BINDIR)/$(LIBNAME).a $(LIBS) $(EXT_LIBS) $(LFLAGS_TEST)
 
 $(BINDIR)/lib%.a: %		# somehow this rule doesn't work
 	cd ../$<; make; cd $(project)

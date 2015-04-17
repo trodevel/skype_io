@@ -19,13 +19,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1691 $ $Date:: 2015-04-01 #$ $Author: serge $
+// $Revision: 1703 $ $Date:: 2015-04-14 #$ $Author: serge $
 
 #include "event_gen.h"              // self
 
 #include "event_parser.h"           // EventParser
 
-#include "../utils/wrap_mutex.h"    // SCOPE_LOCK
+#include "../utils/mutex_helper.h"  // MUTEX_SCOPE_LOCK
 #include "../utils/assert.h"        // ASSERT
 
 NAMESPACE_SKYPE_WRAP_START
@@ -43,7 +43,7 @@ bool EventGen::register_callback( ISkypeCallback * callback )
     if( callback == nullptr )
         return false;
 
-    SCOPE_LOCK( mutex_ );
+    MUTEX_SCOPE_LOCK( mutex_ );
 
     ASSERT( callback_ == nullptr );
 
@@ -58,7 +58,7 @@ void EventGen::handle( const std::string & s )
 
     Event *ev = EventParser::to_event( s );
 
-    SCOPE_LOCK( mutex_ );
+    MUTEX_SCOPE_LOCK( mutex_ );
 
     callback_->consume( ev );
 }
