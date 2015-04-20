@@ -1,9 +1,10 @@
 
 * Ubuntu Server 14.04
 
--- install Vistual display and x11 VNC server
+-- install Vistual display and x11 VNC server (and optionally fluxbox)
 
-sudo apt-get install xvfb x11vnc screen
+sudo apt-get install xvfb x11vnc
+sudo apt-get install fluxbox (optionally)
 sudo apt-get install libgtk2.0-0:i386
 
 -- install Skype
@@ -14,15 +15,19 @@ sudo apt-get install skype
 
 -- launch Skype
 
-screen -S Skype xvfb-run -n 0 -s "-screen 0 800x600x16" /usr/bin/skype
+$ Xvfb -screen 0 800x600x16 -ac &
+$ DISPLAY=:0 skype &
 
 -- launch x11 VNC server
 
-ps wwwwaux | grep auth
-x11vnc -display :0 -auth ...
+x11vnc -display :0
 
 -- in Virtualbox
 
-make port forwaring: 5900 to 5900
+make port forwarding: 5900 to 5900
 
 Settings -> Network -> Adapter 1 -> Port Forwarding
+
+-- launch VNC viewer
+
+vncviewer -FullColor <host_ip>:0
