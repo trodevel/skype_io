@@ -9,25 +9,9 @@ MODE ?= debug
 
 ###################################################################
 
-BOOST_PATH := $(shell echo $$BOOST_PATH)
-
-ifeq (,$(BOOST_PATH))
-    $(error 'please define path to boost $$BOOST_PATH')
-endif
-
-###################################################################
-
-BOOST_INC=$(BOOST_PATH)
-BOOST_LIB_PATH=$(BOOST_PATH)/stage/lib
-
-BOOST_LIB_NAMES := system
-BOOST_LIBS = $(patsubst %,$(BOOST_LIB_PATH)/libboost_%.a,$(BOOST_LIB_NAMES))
-
-###################################################################
-
 GDK_LIB=$(shell pkg-config --libs dbus-1)
 GDK_INC=$(shell pkg-config --cflags dbus-1)
-EXT_LIBS=$(GDK_LIB) $(BOOST_LIBS)
+EXT_LIBS=$(GDK_LIB)
 
 ###################################################################
 
@@ -63,7 +47,7 @@ CC=gcc
 
 LDSHARED=gcc
 CPP=gcc -E
-INCL = -I$(BOOST_INC) $(GDK_INC) -I.
+INCL = $(GDK_INC) -I.
 
 
 STATICLIB=$(LIBNAME).a

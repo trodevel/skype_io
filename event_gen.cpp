@@ -19,11 +19,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1703 $ $Date:: 2015-04-14 #$ $Author: serge $
+// $Revision: 1718 $ $Date:: 2015-04-21 #$ $Author: serge $
 
 #include "event_gen.h"              // self
 
 #include "event_parser.h"           // EventParser
+
+#include <iostream>                 // std::cout
 
 #include "../utils/mutex_helper.h"  // MUTEX_SCOPE_LOCK
 #include "../utils/assert.h"        // ASSERT
