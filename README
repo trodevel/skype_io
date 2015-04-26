@@ -2,3 +2,33 @@
 * tested on Ubuntu Server 14.04.1 and Skype 4.3.0.37
 
 Skype installation instruction in INSTALL.SKYPE
+
+* sample output
+
+$ DISPLAY=:0 ./example
+     |SkypeIo: init()
+DEBUG|SkypeWrap: init()
+type exit or quit to quit: 
+your command: TRACE|SkypeWrap: SkypeWrapImpl::thread_func: started
+EventGen::handle: :1.5
+got event 1
+EventGen::handle: OK
+got event 1
+EventGen::handle: PROTOCOL 5
+got event 1
+EventGen::handle: CONNSTATUS ONLINE
+got event 3
+EventGen::handle: CURRENTUSERHANDLE johndoe55
+got event 5
+EventGen::handle: USERSTATUS ONLINE
+got event 4
+exit
+command: exit
+exiting ...
+DEBUG|SkypeWrap: shutdown()
+TRACE|SkypeWrap: shutdown__()
+TRACE|SkypeWrap: SkypeWrapImpl::thread_func: exit
+Done! =)
+     |SkypeIo: ~SkypeIo()
+DEBUG|SkypeWrap: ~SkypeWrapImpl()
+$

@@ -12,3 +12,17 @@ own:
 
 - utils (logger)
 - threcon (optionally)
+
+* start on Ubuntu Server 14.04
+
+- start Xvfb
+
+$ Xvfb -screen 0 800x600x16 -ac &
+
+- start Skype
+
+$ DISPLAY=:0 skype &
+
+- start example
+
+$ DISPLAY=:0 ./example
