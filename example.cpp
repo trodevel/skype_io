@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1703 $ $Date:: 2015-04-14 #$ $Author: serge $
+// $Revision: 1747 $ $Date:: 2015-05-13 #$ $Author: elena $
 
 #include <thread>           // std::thread
 #include <functional>       // std::bind
@@ -39,7 +39,12 @@ public:
     // callback interface
     virtual void consume( const skype_wrap::Event * e )
     {
-        std::cout << "got event " << e->get_type() << std::endl;
+        std::cout << "got event " << e->get_type();
+
+        if( e->has_hash_id() )
+            std::cout << " #" << e->get_hash_id();
+
+        std::cout << std::endl;
 
         delete e;
     }

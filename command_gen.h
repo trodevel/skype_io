@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1404 $ $Date:: 2015-01-16 #$ $Author: serge $
+// $Revision: 1741 $ $Date:: 2015-05-13 #$ $Author: elena $
 
 #ifndef COMMAND_GEN_H
 #define COMMAND_GEN_H
@@ -34,19 +34,19 @@ NAMESPACE_SKYPE_WRAP_START
 class CommandGen
 {
 public:
-    static std::string protocol( uint32 n );
-    static std::string call( const std::string & s );
-    static std::string get_call_property( uint32 id, const std::string & s );
-    static std::string set_call_status( uint32 id, call_status_e s );
-    static std::string alter_call_hangup( uint32 id );
-    static std::string alter_call_set_input_soundcard( uint32 id );
-    static std::string alter_call_set_input_port( uint32 id, uint32 p );
-    static std::string alter_call_set_input_file( uint32 id, const std::string & s );
-    static std::string alter_call_set_output_soundcard( uint32 id );
-    static std::string alter_call_set_output_port( uint32 id, uint32 p );
-    static std::string alter_call_set_output_file( uint32 id, const std::string & s );
-    static std::string alter_call_set_capture_mic_port( uint32 id, uint32 p );
-    static std::string alter_call_set_capture_mic_file( uint32 id, const std::string & s );
+    static std::string protocol( uint32 n, uint32 hash_id = 0 );
+    static std::string call( const std::string & s, uint32 hash_id = 0 );
+    static std::string get_call_property( uint32 id, const std::string & s, uint32 hash_id = 0 );
+    static std::string set_call_status( uint32 id, call_status_e s, uint32 hash_id = 0 );
+    static std::string alter_call_hangup( uint32 id, uint32 hash_id = 0 );
+    static std::string alter_call_set_input_soundcard( uint32 id, uint32 hash_id = 0 );
+    static std::string alter_call_set_input_port( uint32 id, uint32 p, uint32 hash_id = 0 );
+    static std::string alter_call_set_input_file( uint32 id, const std::string & s, uint32 hash_id = 0 );
+    static std::string alter_call_set_output_soundcard( uint32 id, uint32 hash_id = 0 );
+    static std::string alter_call_set_output_port( uint32 id, uint32 p, uint32 hash_id = 0 );
+    static std::string alter_call_set_output_file( uint32 id, const std::string & s, uint32 hash_id = 0 );
+    static std::string alter_call_set_capture_mic_port( uint32 id, uint32 p, uint32 hash_id = 0 );
+    static std::string alter_call_set_capture_mic_file( uint32 id, const std::string & s, uint32 hash_id = 0 );
 };
 
 NAMESPACE_SKYPE_WRAP_END

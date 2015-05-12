@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1404 $ $Date:: 2015-01-16 #$ $Author: serge $
+// $Revision: 1743 $ $Date:: 2015-05-13 #$ $Author: elena $
 
 #ifndef EVENT_PARSER_H
 #define EVENT_PARSER_H
@@ -49,21 +49,21 @@ public:
 
 private:
 
-    static Event* create_unknown( const std::string & s );
+    static Event* create_unknown( const std::string & s, const std::string & hash_id );
 
     static Event* handle_tokens( std::vector< std::string > & toks, const std::string & s );
 
     static Event* handle_tokens__throwing( std::vector< std::string > & toks, const std::string & s );
     static void get_keyw_and_command_id( std::vector< std::string > & toks, std::string & keyw, std::string & id );
 
-    static Event* handle_connstatus( const std::vector< std::string > & toks );
-    static Event* handle_userstatus( const std::vector< std::string > & toks );
-    static Event* handle_currentuserhandle( const std::vector< std::string > & toks );
-    static Event* handle_error( const std::vector< std::string > & toks );
-    static Event* handle_call( const std::vector< std::string > & toks );
-    static Event* handle_alter_call( const std::vector< std::string > & toks );
-    static Event* handle_chat( const std::vector< std::string > & toks );
-    static Event* handle_chatmember( const std::vector< std::string > & toks );
+    static Event* handle_connstatus( const std::vector< std::string > & toks, const std::string & hash_id );
+    static Event* handle_userstatus( const std::vector< std::string > & toks, const std::string & hash_id );
+    static Event* handle_currentuserhandle( const std::vector< std::string > & toks, const std::string & hash_id );
+    static Event* handle_error( const std::vector< std::string > & toks, const std::string & hash_id );
+    static Event* handle_call( const std::vector< std::string > & toks, const std::string & hash_id );
+    static Event* handle_alter_call( const std::vector< std::string > & toks, const std::string & hash_id );
+    static Event* handle_chat( const std::vector< std::string > & toks, const std::string & hash_id );
+    static Event* handle_chatmember( const std::vector< std::string > & toks, const std::string & hash_id );
 };
 
 NAMESPACE_SKYPE_WRAP_END

@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1695 $ $Date:: 2015-04-01 #$ $Author: serge $
+// $Revision: 1746 $ $Date:: 2015-05-13 #$ $Author: elena $
 
 #include "skype_wrap.h"     // self
 
@@ -313,12 +313,12 @@ DBusHandlerResult SkypeWrapImpl::signal_filter( DBusConnection */*connection*/, 
 //      printf("Signal: Response : %s\n", s);
 
         // Skip sequence number for global message handler;
-        const char* ptr = s;
-        if( s[0] == '#' )
-            ptr = strchr( s, ' ' ) + 1;
+//        const char* ptr = s;
+//        if( s[0] == '#' )
+//            ptr = strchr( s, ' ' ) + 1;
         //priv->message_handler(ptr);
 
-        priv->response_ = ptr;
+        priv->response_ = s;
         priv->sequence_++;
 
 //      if (strstr(s, prefix.c_str()) == s) {
