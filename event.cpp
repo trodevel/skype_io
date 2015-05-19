@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1744 $ $Date:: 2015-05-13 #$ $Author: elena $
+// $Revision: 1748 $ $Date:: 2015-05-18 #$ $Author: serge $
 
 #include "event.h"                  // self
 
@@ -29,7 +29,7 @@ NAMESPACE_SKYPE_WRAP_START
 
 Event::Event(
     Event::type_e       type,
-    const std::string   & hash_id ):
+    uint32_t            hash_id ):
     type_( type ),
     hash_id_( hash_id )
 {
@@ -40,14 +40,14 @@ Event::type_e Event::get_type() const
     return type_;
 }
 
-const std::string & Event::get_hash_id() const
+uint32_t Event::get_hash_id() const
 {
     return hash_id_;
 }
 
 bool Event::has_hash_id() const
 {
-    return hash_id_.empty() == false;
+    return hash_id_ != 0;
 }
 
 NAMESPACE_SKYPE_WRAP_END

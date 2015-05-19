@@ -19,12 +19,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1742 $ $Date:: 2015-05-13 #$ $Author: elena $
+// $Revision: 1748 $ $Date:: 2015-05-18 #$ $Author: serge $
 
 #ifndef EVENT_H
 #define EVENT_H
 
-#include <string>               // std::string
+#include <cstdint>                  // uint32_t
 
 #include "namespace_lib.h"          // NAMESPACE_SKYPE_WRAP_START
 
@@ -61,18 +61,18 @@ public:
 public:
     Event(
         Event::type_e       type,
-        const std::string   & hash_id );
+        uint32_t            hash_id );
 
     virtual ~Event() {}
 
     type_e get_type() const;
-    const std::string & get_hash_id() const;
+    uint32_t get_hash_id() const;
     bool has_hash_id() const;
 
 private:
 
     type_e          type_;
-    std::string     hash_id_;
+    uint32_t        hash_id_;
 };
 
 NAMESPACE_SKYPE_WRAP_END

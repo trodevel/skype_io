@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1741 $ $Date:: 2015-05-13 #$ $Author: elena $
+// $Revision: 1741 $ $Date:: 2015-05-12 #$ $Author: elena $
 
 #ifndef COMMAND_GEN_H
 #define COMMAND_GEN_H

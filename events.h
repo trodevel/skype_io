@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1742 $ $Date:: 2015-05-13 #$ $Author: elena $
+// $Revision: 1748 $ $Date:: 2015-05-18 #$ $Author: serge $
 
 #ifndef EVENTS_H
 #define EVENTS_H
@@ -80,7 +80,7 @@ public:
     BasicCallEvent(
         Event::type_e       type,
         uint32              call_id,
-        const std::string   & hash_id ):
+        uint32_t            hash_id ):
             Event( type, hash_id ),
             call_id_( call_id )
     {
@@ -103,7 +103,7 @@ public:
         Event::type_e       type,
         uint32              call_id,
         uint32              par_int,
-        const std::string   & hash_id ):
+        uint32_t            hash_id ):
             BasicCallEvent( type, call_id, hash_id ),
             EventDataInt( par_int )
     {
@@ -117,7 +117,7 @@ public:
         Event::type_e       type,
         uint32              call_id,
         const std::string   & par_str,
-        const std::string   & hash_id ):
+        uint32_t            hash_id ):
             BasicCallEvent( type, call_id, hash_id ),
             EventDataStr( par_str )
     {
@@ -132,7 +132,7 @@ public:
     BasicParamEvent(
         Event::type_e       type,
         uint32              par_int,
-        const std::string   & hash_id ):
+        uint32_t            hash_id ):
             Event( type, hash_id ),
             EventDataInt( par_int )
     {
@@ -147,7 +147,7 @@ public:
     BasicParamStrEvent(
         Event::type_e       type,
         const std::string   & par_str,
-        const std::string   & hash_id ):
+        uint32_t            hash_id ):
             Event( type, hash_id ),
             EventDataStr( par_str )
     {
@@ -160,7 +160,7 @@ public:
     ErrorEvent(
         uint32              par_int,
         const std::string   & par_str,
-        const std::string   & hash_id ):
+        uint32_t            hash_id ):
             BasicParamEvent( Event::ERROR, par_int, hash_id ),
             EventDataStr( par_str )
     {
@@ -173,7 +173,7 @@ class ConnStatusEvent: public Event
 public:
     ConnStatusEvent(
         conn_status_e       conn_s,
-        const std::string   & hash_id ):
+        uint32_t            hash_id ):
         Event( Event::CONNSTATUS, hash_id ),
         conn_s_( conn_s )
     {
@@ -194,7 +194,7 @@ class UserStatusEvent: public Event
 public:
     UserStatusEvent(
         user_status_e       user_s,
-        const std::string   & hash_id ):
+        uint32_t            hash_id ):
         Event( Event::USERSTATUS, hash_id ),
         user_s_( user_s )
     {
@@ -216,7 +216,7 @@ class CurrentUserHandleEvent: public BasicParamStrEvent
 public:
     CurrentUserHandleEvent(
         const std::string   & par_str,
-        const std::string   & hash_id ):
+        uint32_t            hash_id ):
             BasicParamStrEvent( Event::CURRENTUSERHANDLE, par_str, hash_id )
     {
     }
@@ -229,7 +229,7 @@ public:
     UserOnlineStatusEvent(
         const std::string   & par_str,
         user_status_e       user_s,
-        const std::string   & hash_id):
+        uint32_t            hash_id):
             BasicParamStrEvent( Event::USER_ONLINE_STATUS, par_str, hash_id ),
             user_s_( user_s )
     {
@@ -249,7 +249,7 @@ public:
 
     CallEvent(
         uint32              call_id,
-        const std::string   & hash_id ):
+        uint32_t            hash_id ):
             BasicCallEvent( Event::CALL, call_id, hash_id )
     {
     }
@@ -261,7 +261,7 @@ public:
     CallDurationEvent(
         uint32              call_id,
         uint32              par_int,
-        const std::string   & hash_id ):
+        uint32_t            hash_id ):
             BasicCallParamEvent( Event::CALL_DURATION, call_id, par_int, hash_id )
     {
     }
@@ -273,7 +273,7 @@ public:
     CallStatusEvent(
         uint32              call_id,
         call_status_e       call_s,
-        const std::string   & hash_id ):
+        uint32_t            hash_id ):
             BasicCallEvent( Event::CALL_STATUS, call_id, hash_id ),
             call_s_( call_s )
     {
@@ -296,7 +296,7 @@ public:
         uint32              call_id,
         uint32              errorcode,
         const std::string   & descr,
-        const std::string   & hash_id ):
+        uint32_t            hash_id ):
             BasicCallParamEvent( Event::CALL_PSTN_STATUS, call_id, errorcode, hash_id ),
             EventDataStr( descr )
     {
@@ -309,7 +309,7 @@ public:
     CallFailureReasonEvent(
             uint32              call_id,
             uint32              par_int,
-            const std::string   & hash_id ):
+            uint32_t            hash_id ):
                 BasicCallParamEvent( Event::CALL_FAILUREREASON, call_id, par_int, hash_id )
     {
     }
@@ -321,7 +321,7 @@ public:
     CallVaaInputStatusEvent(
             uint32              call_id,
             uint32              par_int,
-            const std::string   & hash_id ):
+            uint32_t            hash_id ):
                 BasicCallParamEvent( Event::CALL_VAA_INPUT_STATUS, call_id, par_int, hash_id )
     {
     }

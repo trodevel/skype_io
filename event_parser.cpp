@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1743 $ $Date:: 2015-05-13 #$ $Author: elena $
+// $Revision: 1749 $ $Date:: 2015-05-18 #$ $Author: serge $
 
 #include "event_parser.h"       // self
 
@@ -96,14 +96,16 @@ Event* EventParser::handle_tokens( std::vector< std::string > & toks, const std:
     return nullptr;
 }
 
-void EventParser::get_keyw_and_command_id( std::vector< std::string > & toks, std::string & keyw, std::string & id )
+void EventParser::get_keyw_and_command_id( std::vector< std::string > & toks, std::string & keyw, uint32_t & id )
 {
+    id  = 0;
+
     if( toks[0].empty() )
         return;
 
     if( toks[0][0] == '#' )
     {
-        id = toks[0].substr( 1 );
+        id = std::stoi( toks[0].substr( 1 ) );
         toks.erase( toks.begin() );
     }
 
@@ -113,7 +115,7 @@ void EventParser::get_keyw_and_command_id( std::vector< std::string > & toks, st
     keyw    = toks[0];
 }
 
-Event* EventParser::create_unknown( const std::string & s, const std::string & hash_id )
+Event* EventParser::create_unknown( const std::string & s, uint32_t hash_id )
 {
     return new Event( Event::UNKNOWN, hash_id );
 }
@@ -121,10 +123,10 @@ Event* EventParser::create_unknown( const std::string & s, const std::string & h
 Event* EventParser::handle_tokens__throwing( std::vector< std::string > & toks, const std::string & s )
 {
     if( toks.empty() )
-        return new Event( Event::UNKNOWN, "" );
+        return new Event( Event::UNKNOWN, 0 );
 
     std::string keyw;
-    std::string hash_id;
+    uint32_t hash_id;
     get_keyw_and_command_id( toks, keyw, hash_id );
 
     if( keyw == KEYW_CONNSTATUS )
@@ -170,7 +172,7 @@ Event* EventParser::handle_tokens__throwing( std::vector< std::string > & toks, 
 
 }
 
-Event* EventParser::handle_connstatus( const std::vector< std::string > & toks, const std::string & hash_id )
+Event* EventParser::handle_connstatus( const std::vector< std::string > & toks, uint32_t hash_id )
 {
     if( toks.size() != 2 )
         throw WrongFormat( "expected 2 token(s)" );
@@ -179,7 +181,7 @@ Event* EventParser::handle_connstatus( const std::vector< std::string > & toks, 
 
     return new ConnStatusEvent( c, hash_id );
 }
-Event* EventParser::handle_userstatus( const std::vector< std::string > & toks, const std::string & hash_id )
+Event* EventParser::handle_userstatus( const std::vector< std::string > & toks, uint32_t hash_id )
 {
     if( toks.size() != 2 )
         throw WrongFormat( "expected 2 token(s)" );
@@ -188,7 +190,7 @@ Event* EventParser::handle_userstatus( const std::vector< std::string > & toks, 
 
     return new UserStatusEvent( c, hash_id );
 }
-Event* EventParser::handle_currentuserhandle( const std::vector< std::string > & toks, const std::string & hash_id )
+Event* EventParser::handle_currentuserhandle( const std::vector< std::string > & toks, uint32_t hash_id )
 {
     if( toks.size() != 2 )
         throw WrongFormat( "expected 2 token(s)" );
@@ -197,7 +199,7 @@ Event* EventParser::handle_currentuserhandle( const std::vector< std::string > &
 
     return new CurrentUserHandleEvent( s, hash_id );
 }
-Event* EventParser::handle_call( const std::vector< std::string > & toks, const std::string & hash_id )
+Event* EventParser::handle_call( const std::vector< std::string > & toks, uint32_t hash_id )
 {
     if( toks.size() < 4 )
         throw WrongFormat( "expected at least 4 token(s)" );
@@ -266,7 +268,7 @@ Event* EventParser::handle_call( const std::vector< std::string > & toks, const 
     return new BasicParamStrEvent( Event::UNKNOWN, keyw2, hash_id );
 }
 
-Event* EventParser::handle_error( const std::vector< std::string > & toks, const std::string & hash_id )
+Event* EventParser::handle_error( const std::vector< std::string > & toks, uint32_t hash_id )
 {
     if( toks.size() < 2 )
         throw WrongFormat( "expected at least 2 token(s)" );
@@ -280,7 +282,7 @@ Event* EventParser::handle_error( const std::vector< std::string > & toks, const
     return new ErrorEvent( error, descr, hash_id );
 }
 
-Event* EventParser::handle_alter_call( const std::vector< std::string > & toks, const std::string & hash_id )
+Event* EventParser::handle_alter_call( const std::vector< std::string > & toks, uint32_t hash_id )
 {
     // ALTER CALL 846 SET_INPUT file="c:\test.wav"
 
@@ -313,12 +315,12 @@ Event* EventParser::handle_alter_call( const std::vector< std::string > & toks, 
     return create_unknown( toks[3], hash_id );
 }
 
-Event* EventParser::handle_chat( const std::vector< std::string > & toks, const std::string & hash_id )
+Event* EventParser::handle_chat( const std::vector< std::string > & toks, uint32_t hash_id )
 {
     return new Event( Event::CHAT, hash_id );
 }
 
-Event* EventParser::handle_chatmember( const std::vector< std::string > & toks, const std::string & hash_id )
+Event* EventParser::handle_chatmember( const std::vector< std::string > & toks, uint32_t hash_id )
 {
     return new Event( Event::CHATMEMBER, hash_id );
 }
