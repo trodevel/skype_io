@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1693 $ $Date:: 2015-04-01 #$ $Author: serge $
+// $Revision: 1750 $ $Date:: 2015-05-19 #$ $Author: serge $
 
 #ifndef SKYPE_IO_H
 #define SKYPE_IO_H
@@ -56,18 +56,18 @@ public:
     bool send_raw( const std::string & s );
 
     // Skype interface
-    bool call( const std::string & s );
-    bool get_call_property( uint32 id, const std::string & s );
-    bool set_call_status( uint32 id, call_status_e s );
-    bool alter_call_hangup( uint32 id );
-    bool alter_call_set_input_soundcard( uint32 id );
-    bool alter_call_set_input_port( uint32 id, uint32 p );
-    bool alter_call_set_input_file( uint32 id, const std::string & s );
-    bool alter_call_set_output_soundcard( uint32 id );
-    bool alter_call_set_output_port( uint32 id, uint32 p );
-    bool alter_call_set_output_file( uint32 id, const std::string & s );
-    bool alter_call_set_capture_mic_port( uint32 id, uint32 p );
-    bool alter_call_set_capture_mic_file( uint32 id, const std::string & s );
+    bool call( const std::string & s, uint32 hash_id = 0 );
+    bool get_call_property( uint32 id, const std::string & s, uint32 hash_id = 0 );
+    bool set_call_status( uint32 id, call_status_e s, uint32 hash_id = 0 );
+    bool alter_call_hangup( uint32 id, uint32 hash_id = 0 );
+    bool alter_call_set_input_soundcard( uint32 id, uint32 hash_id = 0 );
+    bool alter_call_set_input_port( uint32 id, uint32 p, uint32 hash_id = 0 );
+    bool alter_call_set_input_file( uint32 id, const std::string & s, uint32 hash_id = 0 );
+    bool alter_call_set_output_soundcard( uint32 id, uint32 hash_id = 0 );
+    bool alter_call_set_output_port( uint32 id, uint32 p, uint32 hash_id = 0 );
+    bool alter_call_set_output_file( uint32 id, const std::string & s, uint32 hash_id = 0 );
+    bool alter_call_set_capture_mic_port( uint32 id, uint32 p, uint32 hash_id = 0 );
+    bool alter_call_set_capture_mic_file( uint32 id, const std::string & s, uint32 hash_id = 0 );
 
     void control_thread();
 

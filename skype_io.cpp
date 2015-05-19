@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1693 $ $Date:: 2015-04-01 #$ $Author: serge $
+// $Revision: 1752 $ $Date:: 2015-05-19 #$ $Author: serge $
 
 #include "skype_io.h"       // self
 
@@ -38,20 +38,20 @@ SkypeIo::SkypeIo()
 
 SkypeIo::~SkypeIo()
 {
-    dummy_log( 0, MODULENAME, "~SkypeIo()" );
+    dummy_log_debug( MODULENAME, "~SkypeIo()" );
 
     MUTEX_SCOPE_LOCK( mutex_ );
 }
 
 bool SkypeIo::init()
 {
-    dummy_log( 0, MODULENAME, "init()" );
+    dummy_log_debug( MODULENAME, "init()" );
 
     MUTEX_SCOPE_LOCK( mutex_ );
 
     if( sw_.is_inited() )
     {
-        dummy_log( 0, MODULENAME, "init: already inited" );
+        dummy_log_error( MODULENAME, "init: already inited" );
         return false;
     }
 
@@ -88,7 +88,7 @@ std::string SkypeIo::get_error_msg() const
 
 bool SkypeIo::shutdown()
 {
-    dummy_log( 0, MODULENAME, "shutdown()" );
+    dummy_log_debug( MODULENAME, "shutdown()" );
 
     MUTEX_SCOPE_LOCK( mutex_ );
 
@@ -108,97 +108,97 @@ void SkypeIo::control_thread()
 }
 
 // Skype interface
-bool SkypeIo::call( const std::string & s )
+bool SkypeIo::call( const std::string & s, uint32 hash_id )
 {
-    std::string cmd = CommandGen::call( s );
+    std::string cmd = CommandGen::call( s, hash_id );
 
     MUTEX_SCOPE_LOCK( mutex_ );
 
     return sw_.send( cmd );
 }
-bool SkypeIo::get_call_property( uint32 id, const std::string & s )
+bool SkypeIo::get_call_property( uint32 id, const std::string & s, uint32 hash_id )
 {
-    std::string cmd = CommandGen::get_call_property( id, s );
+    std::string cmd = CommandGen::get_call_property( id, s, hash_id );
 
     MUTEX_SCOPE_LOCK( mutex_ );
 
     return sw_.send( cmd );
 }
-bool SkypeIo::set_call_status( uint32 id, call_status_e s )
+bool SkypeIo::set_call_status( uint32 id, call_status_e s, uint32 hash_id )
 {
-    std::string cmd = CommandGen::set_call_status( id, s );
+    std::string cmd = CommandGen::set_call_status( id, s, hash_id );
 
     MUTEX_SCOPE_LOCK( mutex_ );
 
     return sw_.send( cmd );
 }
-bool SkypeIo::alter_call_hangup( uint32 id )
+bool SkypeIo::alter_call_hangup( uint32 id, uint32 hash_id )
 {
-    std::string cmd = CommandGen::alter_call_hangup( id );
+    std::string cmd = CommandGen::alter_call_hangup( id, hash_id );
 
     MUTEX_SCOPE_LOCK( mutex_ );
 
     return sw_.send( cmd );
 }
-bool SkypeIo::alter_call_set_input_soundcard( uint32 id )
+bool SkypeIo::alter_call_set_input_soundcard( uint32 id, uint32 hash_id )
 {
-    std::string cmd = CommandGen::alter_call_set_input_soundcard( id );
+    std::string cmd = CommandGen::alter_call_set_input_soundcard( id, hash_id );
 
     MUTEX_SCOPE_LOCK( mutex_ );
 
     return sw_.send( cmd );
 }
-bool SkypeIo::alter_call_set_input_port( uint32 id, uint32 p )
+bool SkypeIo::alter_call_set_input_port( uint32 id, uint32 p, uint32 hash_id )
 {
-    std::string cmd = CommandGen::alter_call_set_input_port( id, p );
+    std::string cmd = CommandGen::alter_call_set_input_port( id, p, hash_id );
 
     MUTEX_SCOPE_LOCK( mutex_ );
 
     return sw_.send( cmd );
 }
-bool SkypeIo::alter_call_set_input_file( uint32 id, const std::string & s )
+bool SkypeIo::alter_call_set_input_file( uint32 id, const std::string & s, uint32 hash_id )
 {
-    std::string cmd = CommandGen::alter_call_set_input_file( id, s );
+    std::string cmd = CommandGen::alter_call_set_input_file( id, s, hash_id );
 
     MUTEX_SCOPE_LOCK( mutex_ );
 
     return sw_.send( cmd );
 }
-bool SkypeIo::alter_call_set_output_soundcard( uint32 id )
+bool SkypeIo::alter_call_set_output_soundcard( uint32 id, uint32 hash_id )
 {
-    std::string cmd = CommandGen::alter_call_set_output_soundcard( id );
+    std::string cmd = CommandGen::alter_call_set_output_soundcard( id, hash_id );
 
     MUTEX_SCOPE_LOCK( mutex_ );
 
     return sw_.send( cmd );
 }
-bool SkypeIo::alter_call_set_output_port( uint32 id, uint32 p )
+bool SkypeIo::alter_call_set_output_port( uint32 id, uint32 p, uint32 hash_id )
 {
-    std::string cmd = CommandGen::alter_call_set_output_port( id, p );
+    std::string cmd = CommandGen::alter_call_set_output_port( id, p, hash_id );
 
     MUTEX_SCOPE_LOCK( mutex_ );
 
     return sw_.send( cmd );
 }
-bool SkypeIo::alter_call_set_output_file( uint32 id, const std::string & s )
+bool SkypeIo::alter_call_set_output_file( uint32 id, const std::string & s, uint32 hash_id )
 {
-    std::string cmd = CommandGen::alter_call_set_output_file( id, s );
+    std::string cmd = CommandGen::alter_call_set_output_file( id, s, hash_id );
 
     MUTEX_SCOPE_LOCK( mutex_ );
 
     return sw_.send( cmd );
 }
-bool SkypeIo::alter_call_set_capture_mic_port( uint32 id, uint32 p )
+bool SkypeIo::alter_call_set_capture_mic_port( uint32 id, uint32 p, uint32 hash_id )
 {
-    std::string cmd = CommandGen::alter_call_set_capture_mic_port( id, p );
+    std::string cmd = CommandGen::alter_call_set_capture_mic_port( id, p, hash_id );
 
     MUTEX_SCOPE_LOCK( mutex_ );
 
     return sw_.send( cmd );
 }
-bool SkypeIo::alter_call_set_capture_mic_file( uint32 id, const std::string & s )
+bool SkypeIo::alter_call_set_capture_mic_file( uint32 id, const std::string & s, uint32 hash_id )
 {
-    std::string cmd = CommandGen::alter_call_set_capture_mic_file( id, s );
+    std::string cmd = CommandGen::alter_call_set_capture_mic_file( id, s, hash_id );
 
     MUTEX_SCOPE_LOCK( mutex_ );
 
