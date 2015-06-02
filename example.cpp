@@ -1,6 +1,6 @@
 /*
 
-SkypeIo usage example.
+SkypeLowIo usage example.
 
 Copyright (C) 2014 Sergey Kolevatov
 
@@ -19,35 +19,64 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1747 $ $Date:: 2015-05-13 #$ $Author: elena $
+// $Revision: 1802 $ $Date:: 2015-06-01 #$ $Author: serge $
 
 #include <thread>           // std::thread
 #include <functional>       // std::bind
 #include <iostream>         // cout
 
 #include "../utils/dummy_logger.h"      // dummy_log_set_log_level
-#include "skype_io.h"       // SkypeIo
-#include "event.h"          // Event
+#include "skype_low_io.h"   // SkypeLowIo
 
-class SkypeCallback: virtual public skype_wrap::ISkypeCallback
+class Callback: virtual public skype_io::ICallback
 {
 public:
-    SkypeCallback()
+
+    Callback( skype_io::SkypeLowIo * sio ):
+        sio_( sio )
     {
     }
 
     // callback interface
-    virtual void consume( const skype_wrap::Event * e )
+    virtual void handle( const std::string & s )
     {
-        std::cout << "got event " << e->get_type();
-
-        if( e->has_hash_id() )
-            std::cout << " #" << e->get_hash_id();
-
-        std::cout << std::endl;
-
-        delete e;
+        std::cout << "got " << s << std::endl;
     }
+
+    void control_thread()
+    {
+        std::cout << "type exit or quit to quit: " << std::endl;
+
+        std::string input;
+
+        while( true )
+        {
+            std::cout << "your command: ";
+
+            std::getline( std::cin, input );
+
+            std::cout << "command: " << input << std::endl;
+
+            if( input == "exit" || input == "quit" )
+                break;
+
+            bool b = sio_->send( input );
+
+            if( b == false )
+            {
+                std::cout << "ERROR: cannot process command '" << input << "'" << std::endl;
+            }
+
+        };
+
+        std::cout << "exiting ..." << std::endl;
+
+        sio_->shutdown();
+    }
+
+private:
+    skype_io::SkypeLowIo * sio_;
+
 };
 
 
@@ -55,21 +84,21 @@ int main( int argc, char **argv )
 {
     dummy_logger::set_log_level( log_levels_log4j::TRACE );
 
-    skype_wrap::SkypeIo sio;
+    skype_io::SkypeLowIo sio;
 
     bool b = sio.init();
 
-    if( !b )
+    if( b == false )
     {
-        std::cout << "cannot initialize SkypeIo - " << sio.get_error_msg() << std::endl;
+        std::cout << "cannot initialize SkypeLowIo - " << sio.get_error_msg() << std::endl;
         return 0;
     }
 
-    SkypeCallback test;
+    Callback test( & sio );
 
     sio.register_callback( &test );
 
-    std::thread t( std::bind( &skype_wrap::SkypeIo::control_thread, &sio ) );
+    std::thread t( std::bind( &Callback::control_thread, &test ) );
 
     t.join();
 

@@ -1,6 +1,6 @@
 /*
 
-Skype wrapper.
+Skype Low level I/O.
 
 Copyright (C) 2014 Sergey Kolevatov
 
@@ -19,9 +19,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1746 $ $Date:: 2015-05-13 #$ $Author: elena $
+// $Revision: 1802 $ $Date:: 2015-06-01 #$ $Author: serge $
 
-#include "skype_wrap.h"     // self
+#include "skype_low_io.h"       // self
 
 #include <sstream>              // std::stringstream
 #include <cstring>              // strchr
@@ -34,27 +34,27 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include "../utils/dummy_logger.h"  // dummy_log
 #include "../utils/assert.h"        // ASSERT
 
-#define MODULENAME      "SkypeWrap"
+#define MODULENAME      "SkypeLowIo"
 
 
-NAMESPACE_SKYPE_WRAP_START
+NAMESPACE_SKYPE_IO_START
 
-class SkypeWrapImpl
+class SkypeLowIoImpl
 {
 
 public:
-    SkypeWrapImpl();
-    ~SkypeWrapImpl();
+    SkypeLowIoImpl();
+    ~SkypeLowIoImpl();
 
-    bool init( IObserver * observer );
+    bool init();
 
     bool shutdown();
 
     bool is_inited() const;
 
-    bool send( const std::string & s );
+    bool register_callback( ICallback * callback );
 
-    void control_thread();
+    bool send( const std::string & s );
 
     std::string get_error_msg() const;
 
@@ -86,7 +86,7 @@ private:
 
     dbus::Connection    dbus_;
 
-    IObserver           * callback_;
+    ICallback           * callback_;
 
     unsigned int    sequence_;
 
@@ -97,14 +97,14 @@ private:
     std::string     error_msg_;
 };
 
-SkypeWrapImpl::SkypeWrapImpl():
+SkypeLowIoImpl::SkypeLowIoImpl():
     must_stop_( true ), dbus_( nullptr ), callback_( nullptr ), sequence_( 0 ), is_running_( false )
 {
 }
 
-SkypeWrapImpl::~SkypeWrapImpl()
+SkypeLowIoImpl::~SkypeLowIoImpl()
 {
-    dummy_log_debug( MODULENAME, "~SkypeWrapImpl()" );
+    dummy_log_debug( MODULENAME, "~SkypeLowIoImpl()" );
 
     MUTEX_SCOPE_LOCK( mutex_ );
 
@@ -114,7 +114,7 @@ SkypeWrapImpl::~SkypeWrapImpl()
     }
 }
 
-bool SkypeWrapImpl::init( IObserver * observer )
+bool SkypeLowIoImpl::init()
 {
     dummy_log_debug( MODULENAME, "init()" );
 
@@ -130,7 +130,7 @@ bool SkypeWrapImpl::init( IObserver * observer )
     dbus::Threads::init_default();
     dbus::Error error;
     dbus_ = dbus::Bus::get( DBUS_BUS_SESSION, error );
-    callback_ = observer;
+
     if( !dbus_.get_raw() )
     {
         dummy_log_error( MODULENAME, "%s: %s", error.get_raw().name, error.get_raw().message );
@@ -145,37 +145,52 @@ bool SkypeWrapImpl::init( IObserver * observer )
 
     must_stop_  = false;
 
-    thread_ = std::thread( std::bind( &SkypeWrapImpl::thread_func, this ) );
+    thread_ = std::thread( std::bind( &SkypeLowIoImpl::thread_func, this ) );
 
     return true;
 }
 
-bool SkypeWrapImpl::is_inited() const
+bool SkypeLowIoImpl::is_inited() const
 {
     MUTEX_SCOPE_LOCK( mutex_ );
 
     return is_running_;
 }
 
-bool SkypeWrapImpl::is_inited__() const
+bool SkypeLowIoImpl::is_inited__() const
 {
     return is_running_;
 }
 
-bool SkypeWrapImpl::send( const std::string & s )
+bool SkypeLowIoImpl::register_callback( ICallback * callback )
+{
+    if( callback == nullptr )
+        return false;
+
+    MUTEX_SCOPE_LOCK( mutex_ );
+
+    if( callback_ != nullptr )
+        return false;
+
+    callback_ = callback;
+
+    return true;
+}
+
+bool SkypeLowIoImpl::send( const std::string & s )
 {
     MUTEX_SCOPE_LOCK( mutex_ );
 
     if( !is_inited__() )
     {
-        set_error_msg( "SkypeWrapImpl: not initialized" );
-        throw std::runtime_error( "SkypeWrapImpl: not initialized" );
+        set_error_msg( "SkypeLowIoImpl: not initialized" );
+        throw std::runtime_error( "SkypeLowIoImpl: not initialized" );
     }
 
     return send__( s );
 }
 
-bool SkypeWrapImpl::send__( const std::string & s )
+bool SkypeLowIoImpl::send__( const std::string & s )
 {
     const char* command = s.c_str();
 //  std::cout << "Command: " << ss.str() << endl;
@@ -184,26 +199,26 @@ bool SkypeWrapImpl::send__( const std::string & s )
     return dbus_.send( message, NULL );
 }
 
-void SkypeWrapImpl::set_error_msg( const std::string & s )
+void SkypeLowIoImpl::set_error_msg( const std::string & s )
 {
     error_msg_  = s;
 }
 
-std::string SkypeWrapImpl::get_error_msg() const
+std::string SkypeLowIoImpl::get_error_msg() const
 {
     MUTEX_SCOPE_LOCK( mutex_ );
 
     return error_msg_;
 }
 
-bool SkypeWrapImpl::shutdown()
+bool SkypeLowIoImpl::shutdown()
 {
     dummy_log_debug( MODULENAME, "shutdown()" );
 
     return shutdown__();
 }
 
-bool SkypeWrapImpl::shutdown__()
+bool SkypeLowIoImpl::shutdown__()
 {
     dummy_log_trace( MODULENAME, "shutdown__()" );
 
@@ -219,7 +234,7 @@ bool SkypeWrapImpl::shutdown__()
 }
 
 
-bool SkypeWrapImpl::connect_to_skype()
+bool SkypeLowIoImpl::connect_to_skype()
 {
     send__( "NAME TestApplication" );
 
@@ -228,40 +243,9 @@ bool SkypeWrapImpl::connect_to_skype()
     return true;
 }
 
-void SkypeWrapImpl::control_thread()
+void SkypeLowIoImpl::thread_func()
 {
-    std::cout << "type exit or quit to quit: " << std::endl;
-
-    std::string input;
-
-    while( true )
-    {
-        std::cout << "your command: ";
-
-        std::getline( std::cin, input );
-
-        std::cout << "command: " << input << std::endl;
-
-        if( input == "exit" || input == "quit" )
-            break;
-
-        bool b = send( input );
-
-        if( b == false )
-        {
-            std::cout << "ERROR: cannot process command '" << input << "'" << std::endl;
-        }
-
-    };
-
-    std::cout << "exiting ..." << std::endl;
-
-    shutdown();
-}
-
-void SkypeWrapImpl::thread_func()
-{
-    dummy_log_trace( MODULENAME, "SkypeWrapImpl::thread_func: started" );
+    dummy_log_trace( MODULENAME, "SkypeLowIoImpl::thread_func: started" );
 
     is_running_ = true;
 
@@ -281,10 +265,11 @@ void SkypeWrapImpl::thread_func()
             {
                 if( sequence_ - seq > 1 )
                 {
-                    dummy_log_fatal( MODULENAME, "SkypeWrapImpl::thread_func: missed messages" );
+                    dummy_log_fatal( MODULENAME, "SkypeLowIoImpl::thread_func: missed messages" );
                     ::exit( 42 );
                 }
-                callback_->handle( response_ );
+                if( callback_ )
+                    callback_->handle( response_ );
                 seq = sequence_;
             }
         }
@@ -294,12 +279,12 @@ void SkypeWrapImpl::thread_func()
 
     is_running_ = false;
 
-    dummy_log_trace( MODULENAME, "SkypeWrapImpl::thread_func: exit" );
+    dummy_log_trace( MODULENAME, "SkypeLowIoImpl::thread_func: exit" );
 }
 
-DBusHandlerResult SkypeWrapImpl::signal_filter( DBusConnection */*connection*/, DBusMessage *message, void *user_data )
+DBusHandlerResult SkypeLowIoImpl::signal_filter( DBusConnection */*connection*/, DBusMessage *message, void *user_data )
 {
-    SkypeWrapImpl* priv = (SkypeWrapImpl*)user_data;
+    SkypeLowIoImpl* priv = (SkypeLowIoImpl*)user_data;
     char *s;
     dbus::Error error;
     if( dbus::Message( message ).get_args( error, DBUS_TYPE_STRING, &s, DBUS_TYPE_INVALID ) )
@@ -335,44 +320,44 @@ DBusHandlerResult SkypeWrapImpl::signal_filter( DBusConnection */*connection*/, 
 }
 
 
-SkypeWrap::SkypeWrap():
-        impl_( * new SkypeWrapImpl )
+SkypeLowIo::SkypeLowIo():
+        impl_( * new SkypeLowIoImpl )
 {
 }
 
-SkypeWrap::~SkypeWrap()
+SkypeLowIo::~SkypeLowIo()
 {
     delete & impl_;
 }
 
-bool SkypeWrap::init( IObserver * observer )
+bool SkypeLowIo::init()
 {
-    return impl_.init( observer );
+    return impl_.init();
 }
 
-bool SkypeWrap::shutdown()
+bool SkypeLowIo::shutdown()
 {
     return impl_.shutdown();
 }
 
-bool SkypeWrap::is_inited() const
+bool SkypeLowIo::is_inited() const
 {
     return impl_.is_inited();
 }
 
-bool SkypeWrap::send( const std::string & s )
+bool SkypeLowIo::register_callback( ICallback * callback )
+{
+    return impl_.register_callback( callback );
+}
+
+bool SkypeLowIo::send( const std::string & s )
 {
     return impl_.send( s );
 }
 
-void SkypeWrap::control_thread()
-{
-    impl_.control_thread();
-}
-
-std::string SkypeWrap::get_error_msg() const
+std::string SkypeLowIo::get_error_msg() const
 {
     return impl_.get_error_msg();
 }
 
-NAMESPACE_SKYPE_WRAP_END
+NAMESPACE_SKYPE_IO_END

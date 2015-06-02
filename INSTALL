@@ -11,7 +11,6 @@ sudo apt-get install dbus libdbus-1-dev
 own:
 
 - utils (logger)
-- threcon (optionally)
 
 * start on Ubuntu Server 14.04
 

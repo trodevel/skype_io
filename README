@@ -6,29 +6,40 @@ Skype installation instruction in INSTALL.SKYPE
 * sample output
 
 $ DISPLAY=:0 ./example
-     |SkypeIo: init()
-DEBUG|SkypeWrap: init()
+DEBUG|SkypeLowIo: init()
+TRACE|SkypeLowIo: SkypeLowIoImpl::thread_func: started
+got :1.1902
 type exit or quit to quit: 
-your command: TRACE|SkypeWrap: SkypeWrapImpl::thread_func: started
-EventGen::handle: :1.5
-got event 1
-EventGen::handle: OK
-got event 1
-EventGen::handle: PROTOCOL 5
-got event 1
-EventGen::handle: CONNSTATUS ONLINE
-got event 3
-EventGen::handle: CURRENTUSERHANDLE johndoe55
-got event 5
-EventGen::handle: USERSTATUS ONLINE
-got event 4
+your command: got OK
+got PROTOCOL 5
+got CONNSTATUS ONLINE
+got CURRENTUSERHANDLE johndoe55
+got USERSTATUS ONLINE
+call echo123
+command: call echo123
+your command: got CALL 81325 STATUS UNPLACED
+got CALL 81325 STATUS ROUTING
+got CALL 81325 STATUS ROUTING
+got CALL 81325 STATUS RINGING
+got CALL 81325 STATUS INPROGRESS
+got CALL 81325 DURATION 1
+got CALL 81325 VIDEO_STATUS VIDEO_RECV_ENABLED
+got CALL 81325 DURATION 2
+got CALL 81325 DURATION 3
+got CALL 81325 DURATION 4
+...
+got CALL 81325 DURATION 48
+got CALL 81325 DURATION 49
+got CALL 81325 DURATION 50
+got CALL 81325 FAILUREREASON 14
+got CALL 81325 STATUS FINISHED
 exit
 command: exit
 exiting ...
-DEBUG|SkypeWrap: shutdown()
-TRACE|SkypeWrap: shutdown__()
-TRACE|SkypeWrap: SkypeWrapImpl::thread_func: exit
+DEBUG|SkypeLowIo: shutdown()
+TRACE|SkypeLowIo: shutdown__()
+TRACE|SkypeLowIo: SkypeLowIoImpl::thread_func: exit
 Done! =)
-     |SkypeIo: ~SkypeIo()
-DEBUG|SkypeWrap: ~SkypeWrapImpl()
+DEBUG|SkypeLowIo: ~SkypeLowIoImpl()
 $
+

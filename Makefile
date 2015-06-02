@@ -66,11 +66,7 @@ EXE=
 
 #vpath %.cpp .
 
-SRCC = \
-		dbus.cpp \
-		event.cpp event_gen.cpp event_parser.cpp parser_types.cpp \
-		skype_wrap.cpp skype_io.cpp command_gen.cpp \
-		str_helper.cpp
+SRCC = dbus.cpp skype_low_io.cpp 
 OBJS = $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRCC)) $(patsubst %.c,$(OBJDIR)/%.o,$(SRCC))
 
 LIB_NAMES = utils

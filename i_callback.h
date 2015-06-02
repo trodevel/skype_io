@@ -19,26 +19,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1404 $ $Date:: 2015-01-16 #$ $Author: serge $
+// $Revision: 1800 $ $Date:: 2015-06-01 #$ $Author: serge $
 
-#ifndef I_OBSERVER_H
-#define I_OBSERVER_H
+#ifndef I_SKYPE_IO_CALLBACK_H
+#define I_SKYPE_IO_CALLBACK_H
 
 #include <string>                   // std::string
 
-#include "namespace_lib.h"          // NAMESPACE_SKYPE_WRAP_START
+#include "namespace_lib.h"          // NAMESPACE_SKYPE_IO_START
 
-NAMESPACE_SKYPE_WRAP_START
+NAMESPACE_SKYPE_IO_START
 
-class IObserver
+class ICallback
 {
 
 public:
-    virtual ~IObserver() {};
+    virtual ~ICallback() {};
 
     virtual void handle( const std::string & s )    = 0;
 };
 
-NAMESPACE_SKYPE_WRAP_END
+NAMESPACE_SKYPE_IO_END
 
-#endif  // I_OBSERVER_H
+#endif  // I_SKYPE_IO_CALLBACK_H

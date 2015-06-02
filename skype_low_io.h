@@ -1,6 +1,6 @@
 /*
 
-Skype wrapper.
+Skype Low level I/O.
 
 Copyright (C) 2014 Sergey Kolevatov
 
@@ -19,47 +19,47 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1695 $ $Date:: 2015-04-01 #$ $Author: serge $
+// $Revision: 1802 $ $Date:: 2015-06-01 #$ $Author: serge $
 
-#ifndef SKYPE_WRAP_H
-#define SKYPE_WRAP_H
+#ifndef SKYPE_LOW_IO_H
+#define SKYPE_LOW_IO_H
 
 #include <string>                   // std::string
 #include <mutex>                    // std::mutex
 #include <thread>                   // std::thread
 #include <atomic>                   // std::atomic
 
-#include "namespace_lib.h"          // NAMESPACE_SKYPE_WRAP_START
-#include "i_observer.h"             // IObserver
+#include "namespace_lib.h"          // NAMESPACE_SKYPE_IO_START
+#include "i_callback.h"             // ICallback
 
-NAMESPACE_SKYPE_WRAP_START
+NAMESPACE_SKYPE_IO_START
 
-class SkypeWrapImpl;
+class SkypeLowIoImpl;
 
-class SkypeWrap
+class SkypeLowIo
 {
 
 public:
-    SkypeWrap();
-    ~SkypeWrap();
+    SkypeLowIo();
+    ~SkypeLowIo();
 
-    bool init( IObserver * observer );
+    bool init();
 
     bool shutdown();
 
     bool is_inited() const;
 
-    bool send( const std::string & s );
+    bool register_callback( ICallback * callback );
 
-    void control_thread();
+    bool send( const std::string & s );
 
     std::string get_error_msg() const;
 
 private:
 
-    SkypeWrapImpl       & impl_;
+    SkypeLowIoImpl       & impl_;
 };
 
-NAMESPACE_SKYPE_WRAP_END
+NAMESPACE_SKYPE_IO_END
 
-#endif  // SKYPE_WRAP_H
+#endif  // SKYPE_LOW_IO_H

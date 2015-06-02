@@ -19,12 +19,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1404 $ $Date:: 2015-01-16 #$ $Author: serge $
+// $Revision: 1795 $ $Date:: 2015-06-01 #$ $Author: serge $
 
-#ifndef NAMESPACE_SKYPEWRAP_H
-#define NAMESPACE_SKYPEWRAP_H
+#ifndef NAMESPACE_SKYPE_LOW_IO_H
+#define NAMESPACE_SKYPE_LOW_IO_H
 
-#define NAMESPACE_SKYPE_WRAP_START  namespace skype_wrap {
-#define NAMESPACE_SKYPE_WRAP_END    }
+#define NAMESPACE_SKYPE_IO_START  namespace skype_io {
+#define NAMESPACE_SKYPE_IO_END    }
 
-#endif  // NAMESPACE_SKYPEWRAP_H
+#endif  // NAMESPACE_SKYPE_LOW_IO_H
