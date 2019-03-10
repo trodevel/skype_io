@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 1802 $ $Date:: 2015-06-01 #$ $Author: serge $
+// $Revision: 10617 $ $Date:: 2019-03-10 #$ $Author: serge $
 
 #include "skype_low_io.h"       // self
 
@@ -32,7 +32,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "../utils/mutex_helper.h"  // MUTEX_SCOPE_LOCK
 #include "../utils/dummy_logger.h"  // dummy_log
-#include "../utils/assert.h"        // ASSERT
+#include "../utils/utils_assert.h"        // ASSERT
+#include "../utils/set_this_thread_name.h"      // set_this_thread_name()
 
 #define MODULENAME      "SkypeLowIo"
 
@@ -245,6 +246,8 @@ bool SkypeLowIoImpl::connect_to_skype()
 
 void SkypeLowIoImpl::thread_func()
 {
+    utils::set_this_thread_name( "skype_low_io" );
+
     dummy_log_trace( MODULENAME, "SkypeLowIoImpl::thread_func: started" );
 
     is_running_ = true;
